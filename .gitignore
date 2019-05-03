@@ -1,0 +1,7 @@
+*.class
+*.log
+.gradle/
+target/
+.idea/
+out/
+build/
