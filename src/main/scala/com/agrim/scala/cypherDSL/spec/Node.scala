@@ -4,18 +4,12 @@ import com.agrim.scala.cypherDSL.spec.implicits.QueryProvider
 import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 
-private[spec] sealed trait CypherEntity {
-  def toQuery: String
-}
-
-private[spec] case class Node[T <: Product: QueryProvider, H <: HList](element: T, private val properties: H)(
-    implicit context: Context,
-    i0: ToTraversable.Aux[H, List, Symbol])
-    extends CypherEntity {
-
+private[spec] sealed abstract class CypherEntity[T <: Product: QueryProvider, H <: HList](
+    element: T,
+    private val properties: H)(implicit context: Context, i0: ToTraversable.Aux[H, List, Symbol]) {
   private val queryProvider = implicitly[QueryProvider[T]]
 
-  override def toQuery: String =
+  def toQuery: String =
     context
       .map(element)(getIdentifierOnlyQuery)
       .getOrElse {
@@ -39,4 +33,17 @@ private[spec] case class Node[T <: Product: QueryProvider, H <: HList](element: 
   }
 
   private def makeQuery(repr: String) = s"$repr"
+}
+
+private[spec] case class Node[T <: Product: QueryProvider, H <: HList](element: T, private val properties: H)(
+    implicit context: Context,
+    i0: ToTraversable.Aux[H, List, Symbol])
+    extends CypherEntity(element, properties) {
+  override def toQuery: String = s"(${super.toQuery})"
+}
+private[spec] case class Relationship[T <: Product: QueryProvider, H <: HList](element: T, private val properties: H)(
+    implicit context: Context,
+    i0: ToTraversable.Aux[H, List, Symbol])
+    extends CypherEntity(element, properties) {
+  override def toQuery: String = s"[${super.toQuery}]"
 }
