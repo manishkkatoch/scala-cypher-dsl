@@ -12,7 +12,8 @@ class Context {
     objects += element -> id
     id
   }
-  def get[T <: Product](element: T): Option[String] = objects.get(element)
+  def get[T <: Product](element: T): Option[String]               = objects.get(element)
+  def map[T <: Product, B](element: T)(f: String => B): Option[B] = objects.get(element).map(f)
 }
 
 object Context {
