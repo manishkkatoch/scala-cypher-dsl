@@ -4,11 +4,11 @@ import com.agrim.scala.cypherDSL.spec.implicits.QueryProvider
 import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 
-sealed trait CypherEntity {
+private[spec] sealed trait CypherEntity {
   def toQuery: String
 }
 
-case class Node[T <: Product: QueryProvider, H <: HList](element: T, private val properties: H)(
+private[spec] case class Node[T <: Product: QueryProvider, H <: HList](element: T, private val properties: H)(
     implicit context: Context,
     i0: ToTraversable.Aux[H, List, Symbol])
     extends CypherEntity {
