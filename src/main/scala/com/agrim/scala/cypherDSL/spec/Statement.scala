@@ -1,6 +1,6 @@
 package com.agrim.scala.cypherDSL.spec
 
-private[spec] case class Statement(returnClause: Returns) {
+private[cypherDSL] case class Statement(returnClause: Returns) {
   def toQuery(implicit context: Context): String = {
     returnClause.toQuery
   }
@@ -8,6 +8,6 @@ private[spec] case class Statement(returnClause: Returns) {
   def addReturnClause(clause: Returns): Statement = copy(returnClause = clause)
 }
 
-private[spec] object Statement {
+private[cypherDSL] object Statement {
   def apply(): Statement = new Statement(Returns.empty)
 }

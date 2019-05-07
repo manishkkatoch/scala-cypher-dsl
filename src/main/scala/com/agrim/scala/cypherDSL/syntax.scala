@@ -1,8 +1,7 @@
 package com.agrim.scala.cypherDSL
 
-import com.agrim.scala.cypherDSL.spec.{Path, PathLink}
+import com.agrim.scala.cypherDSL.spec._
 import com.agrim.scala.cypherDSL.spec.implicits.QueryProvider
-import com.agrim.scala.cypherDSL.spec.{Context, Node, Relationship}
 import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 
