@@ -5,6 +5,7 @@ import com.agrim.scala.cypherDSL.spec.Context
 object TestClasses {
   case class Person(id: String, name: String, age: Int)
   case class Department(id: String, name: String)
+  case class WorksIn(sinceDays: Int)
 
   object implicits {
     implicit val context = new Context()
