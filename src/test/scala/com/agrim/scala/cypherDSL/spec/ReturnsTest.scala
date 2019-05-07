@@ -1,8 +1,8 @@
 package com.agrim.scala.cypherDSL.spec
 
 import org.scalatest.{Matchers, WordSpec}
-import utils.Random._
-import utils.TestClasses.{Department, Person}
+import com.agrim.scala.cypherDSL.spec.utils.Random._
+import com.agrim.scala.cypherDSL.spec.utils.TestClasses.{Department, Person}
 
 class ReturnsTest extends WordSpec with Matchers {
 

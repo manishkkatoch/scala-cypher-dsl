@@ -3,8 +3,8 @@ package com.agrim.scala.cypherDSL.spec.implicits
 import com.agrim.scala.cypherDSL.spec.Context
 import org.scalatest.{Matchers, WordSpec}
 import shapeless.HNil
-import utils.TestClasses.Person
-import utils.Random._
+import com.agrim.scala.cypherDSL.spec.utils.TestClasses.Person
+import com.agrim.scala.cypherDSL.spec.utils.Random._
 
 class QueryProviderTest extends WordSpec with Matchers {
   private implicit val context = new Context()

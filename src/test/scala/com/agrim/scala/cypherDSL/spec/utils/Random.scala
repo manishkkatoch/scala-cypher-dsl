@@ -1,4 +1,4 @@
-package utils
+package com.agrim.scala.cypherDSL.spec.utils
 
 import shapeless.{::, Generic, HList, HNil, Lazy}
 

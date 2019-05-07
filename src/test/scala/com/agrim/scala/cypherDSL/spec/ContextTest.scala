@@ -1,8 +1,8 @@
 package com.agrim.scala.cypherDSL.spec
 
 import org.scalatest.{Matchers, WordSpec}
-import utils.TestClasses.Person
-import utils.Random._
+import com.agrim.scala.cypherDSL.spec.utils.TestClasses.Person
+import com.agrim.scala.cypherDSL.spec.utils.Random._
 
 class ContextTest extends WordSpec with Matchers {
 

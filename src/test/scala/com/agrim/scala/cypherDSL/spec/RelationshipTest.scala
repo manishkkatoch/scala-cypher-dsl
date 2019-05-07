@@ -2,8 +2,8 @@ package com.agrim.scala.cypherDSL.spec
 
 import org.scalatest.{Matchers, WordSpec}
 import shapeless.HNil
-import utils.Random.randomize
-import utils.TestClasses.Person
+import com.agrim.scala.cypherDSL.spec.utils.Random.randomize
+import com.agrim.scala.cypherDSL.spec.utils.TestClasses.Person
 
 class RelationshipTest extends WordSpec with Matchers {
 

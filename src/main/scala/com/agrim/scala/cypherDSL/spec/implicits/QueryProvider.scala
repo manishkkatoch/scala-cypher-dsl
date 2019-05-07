@@ -1,17 +1,17 @@
 package com.agrim.scala.cypherDSL.spec.implicits
 
 import com.agrim.scala.cypherDSL.spec.Context
-import shapeless.{HList, LabelledGeneric}
 import shapeless.ops.hlist.ToTraversable
 import shapeless.ops.record.Keys
+import shapeless.{HList, LabelledGeneric}
 
-private[spec] trait QueryProvider[T <: Product] {
+private[cypherDSL] trait QueryProvider[T <: Product] {
   def getMatchers(element: T)(implicit context: Context): Seq[String]
   def getMatchers[U <: HList](element: T, columns: U)(implicit context: Context,
                                                       i0: ToTraversable.Aux[U, List, Symbol]): Seq[String]
 }
 
-private[spec] object QueryProvider {
+private[cypherDSL] object QueryProvider {
   def apply[T <: Product](implicit queryProvider: QueryProvider[T], context: Context): QueryProvider[T] =
     queryProvider
 
