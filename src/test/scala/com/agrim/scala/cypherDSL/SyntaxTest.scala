@@ -40,55 +40,55 @@ class SyntaxTest extends WordSpec with Matchers {
         implicit val context: Context = new Context()
 
         val path = person -| worksIn |- department
-        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WorksIn {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})"
+        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})"
       }
       "provide (A) -[R]-> (B) grammar" in {
         implicit val context: Context = new Context()
 
         val path = person -| worksIn |-> department
-        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WorksIn {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})"
+        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})"
       }
       "provide (A) <-[R]- (B) grammar" in {
         implicit val context: Context = new Context()
 
         val path = person <-| worksIn |- department
-        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WorksIn {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})"
+        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})"
       }
       "provide (A)-[R]-(B)-[R2]-(A2) grammar" in {
         implicit val context = new Context()
 
         val path = person -| worksIn |- department -| locatedIn |- region
-        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WorksIn {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})-[a3:LocatedIn {}]-(a4:Region {name: {a4_name}})"
+        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})-[a3:LOCATED_IN {}]-(a4:Region {name: {a4_name}})"
       }
       "provide (A)-[R]->(B)-[R2]->(A2) grammar" in {
         implicit val context = new Context()
 
         val path = person -| worksIn |-> department -| locatedIn |-> region
-        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WorksIn {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})-[a3:LocatedIn {}]->(a4:Region {name: {a4_name}})"
+        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})-[a3:LOCATED_IN {}]->(a4:Region {name: {a4_name}})"
       }
       "provide (A)<-[R]-(B)<-[R2]-(A2) grammar" in {
         implicit val context = new Context()
 
         val path = person <-| worksIn |- department <-| locatedIn |- region
-        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WorksIn {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})<-[a3:LocatedIn {}]-(a4:Region {name: {a4_name}})"
+        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})<-[a3:LOCATED_IN {}]-(a4:Region {name: {a4_name}})"
       }
       "provide (A)<-[R]-(B)-[R2]->(A2) grammar" in {
         implicit val context = new Context()
 
         val path = person <-| worksIn |- department -| headOfDepartment |-> person2
-        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WorksIn {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})-[a3:HeadOfDepartment {id: {a3_id},name: {a3_name}}]->(a4:Person {id: {a4_id},name: {a4_name},age: {a4_age}})"
+        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})-[a3:HEAD_OF_DEPARTMENT {id: {a3_id},name: {a3_name}}]->(a4:Person {id: {a4_id},name: {a4_name},age: {a4_age}})"
       }
       "provide (A)-[R]->(B)<-[R2]-(A2) grammar" in {
         implicit val context = new Context()
 
         val path = person2 -| headOfDepartment |-> department <-| worksIn |- person
-        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:HeadOfDepartment {id: {a1_id},name: {a1_name}}]->(a2:Department {id: {a2_id},name: {a2_name}})<-[a3:WorksIn {sinceDays: {a3_sinceDays}}]-(a4:Person {id: {a4_id},name: {a4_name},age: {a4_age}})"
+        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:HEAD_OF_DEPARTMENT {id: {a1_id},name: {a1_name}}]->(a2:Department {id: {a2_id},name: {a2_name}})<-[a3:WORKS_IN {sinceDays: {a3_sinceDays}}]-(a4:Person {id: {a4_id},name: {a4_name},age: {a4_age}})"
       }
       "provide (A)<-[R]-(B)<-[R2]-(A2)-->(C) grammar" in {
         implicit val context = new Context()
 
         val path = person <-| worksIn |- department <-| locatedIn |- region --> person2
-        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WorksIn {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})<-[a3:LocatedIn {}]-(a4:Region {name: {a4_name}})-->(a5:Person {id: {a5_id},name: {a5_name},age: {a5_age}})"
+        path.toQuery shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})<-[a3:LOCATED_IN {}]-(a4:Region {name: {a4_name}})-->(a5:Person {id: {a5_id},name: {a5_name},age: {a5_age}})"
       }
     }
     "when in context" should {
