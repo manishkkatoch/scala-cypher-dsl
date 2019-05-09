@@ -16,20 +16,21 @@ class MatchesTest extends WordSpec with Matchers {
       implicit val context: Context = new Context()
 
       val matches = Matches(person)
-      matches.toQuery shouldBe "MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})"
+      matches.toQuery(context) shouldBe "MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})"
     }
     "provide MATCH for a single product in context" in {
       implicit val context: Context = new Context()
       context.add(person)
 
       val matches = Matches(person)
-      matches.toQuery shouldBe "MATCH (a0)"
+      matches.toQuery(context) shouldBe "MATCH (a0)"
     }
     "provide MATCH for a path" in {
       implicit val context: Context = new Context()
 
       val matches = new Matches(person -| worksIn |-> department)
-      matches.toQuery shouldBe "MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})"
+      matches.toQuery(context) shouldBe "MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})"
+
     }
     "provide MATCH for a path in context" in {
       implicit val context: Context = new Context()
@@ -38,7 +39,7 @@ class MatchesTest extends WordSpec with Matchers {
       context.add(department)
 
       val matches = new Matches(person -| worksIn |-> department)
-      matches.toQuery shouldBe "MATCH (a0)-[a1]->(a2)"
+      matches.toQuery(context) shouldBe "MATCH (a0)-[a1]->(a2)"
     }
   }
 }

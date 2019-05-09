@@ -13,11 +13,11 @@ class StatementTest extends WordSpec with Matchers {
     context.add(person)
 
     "return RETURN string if passed a return clause" in {
-      Statement(Returns(person)).toQuery shouldBe "RETURN a0"
+      Statement(Seq.empty, Returns(person)).toQuery(context) shouldBe "RETURN a0"
     }
 
     "return empty string if passed no clauses" in {
-      Statement().toQuery shouldBe ""
+      Statement().toQuery(context) shouldBe ""
     }
   }
 

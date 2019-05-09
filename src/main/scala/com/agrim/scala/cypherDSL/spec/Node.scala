@@ -5,21 +5,23 @@ import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 
 private[spec] sealed abstract class CypherEntity[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
-    implicit context: Context,
-    i0: ToTraversable.Aux[H, List, Symbol]) {
+    implicit i0: ToTraversable.Aux[H, List, Symbol]) {
+
   private val queryProvider = implicitly[QueryProvider[T]]
 
-  def label: String = element.getClass.getSimpleName
-
-  def toQuery: String =
+  def toQuery(context: Context = new Context()): String = {
+    implicit val lpContext = context
     context
       .map(element)(getIdentifierOnlyQuery)
       .getOrElse {
         val id = context.add(element)
         getQueryBasedOnProperties(id)
       }
+  }
 
-  private def getQueryBasedOnProperties(id: String) = {
+  def label: String = element.getClass.getSimpleName
+
+  private def getQueryBasedOnProperties(id: String)(implicit context: Context) = {
     val matchers = properties match {
       case _: HNil => queryProvider.getMatchers(element)
       case _       => queryProvider.getMatchers(element, properties)
@@ -38,16 +40,16 @@ private[spec] sealed abstract class CypherEntity[T <: Product: QueryProvider, H 
 }
 
 private[cypherDSL] case class Node[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
-    implicit context: Context,
-    i0: ToTraversable.Aux[H, List, Symbol])
+    implicit i0: ToTraversable.Aux[H, List, Symbol])
     extends CypherEntity(element, properties) {
-  override def toQuery: String = s"(${super.toQuery})"
+  override def toQuery(context: Context = new Context()): String = s"(${super.toQuery(context)})"
 }
-private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HList](element: T, private val properties: H)(
-    implicit context: Context,
+
+private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
+    implicit
     i0: ToTraversable.Aux[H, List, Symbol])
     extends CypherEntity(element, properties) {
-
+  override def toQuery(context: Context = new Context()): String = s"[${super.toQuery(context)}]"
   private def toUpperSnakeCase(label: String): String = {
     label
       .flatMap(char => {
@@ -58,8 +60,6 @@ private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HLi
       .stripPrefix("_")
       .toUpperCase
   }
-
-  override def toQuery: String = s"[${super.toQuery}]"
-
   override def label: String = toUpperSnakeCase(super.label)
+
 }
