@@ -2,37 +2,48 @@ package com.agrim.scala.cypherDSL.spec
 
 import org.scalatest.{Matchers, WordSpec}
 import shapeless.HNil
-import com.agrim.scala.cypherDSL.spec.utils.Random.randomize
-import com.agrim.scala.cypherDSL.spec.utils.TestClasses.Person
+import utils.Random.randomize
+import utils.TestClasses.IsFriendOf
 
 class RelationshipTest extends WordSpec with Matchers {
+  private val isFriendOf = randomize[IsFriendOf]
 
-  private val person = randomize[Person]
-  "Relationship" must {
-    ".toQuery" must {
-      "given a Product not in Context" must {
-        "provide a string representation with default properties" in {
-          val context    = new Context()
-          val personNode = Relationship(person, HNil)
-          personNode.toQuery(context) shouldBe "[a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}}]"
+  "Relationship" should {
+    ".toQuery" when {
+      "Product is not in the context" must {
+        "return a string representation with default properties" in {
+          val context      = new Context
+          val relationship = Relationship(isFriendOf, HNil)
+
+          relationship.toQuery(context) shouldBe "[a0:IS_FRIEND_OF {since: {a0_since},lastConnectedOn: {a0_lastConnectedOn}}]"
         }
-        "provide a string representation with some properties" in {
-          val context    = new Context()
-          val personNode = Relationship(person, 'id :: 'age :: HNil)
-          personNode.toQuery(context) shouldBe "[a0:Person {id: {a0_id},age: {a0_age}}]"
+
+        "return a string representation with some properties" in {
+          val context      = new Context
+          val relationship = Relationship(isFriendOf, 'since :: HNil)
+
+          relationship.toQuery(context) shouldBe "[a0:IS_FRIEND_OF {since: {a0_since}}]"
         }
       }
-      "given a Product in Context" must {
-        val context = new Context()
-        context.add(person)
 
-        "provide a string representation when no properties provided" in {
-          val personNode = Relationship(person, HNil)
-          personNode.toQuery(context) shouldBe "[a0]"
+      "Product is in the Context" must {
+        "return a string representation when no properties provided" in {
+          val context = new Context()
+          context.add(isFriendOf)
+
+          val relationship = Relationship(isFriendOf, HNil)
+
+          relationship.toQuery(context) shouldBe "[a0]"
         }
-        "provide a string representation when some properties provided" in {
-          val personNode = Relationship(person, 'age :: HNil)
-          personNode.toQuery(context) shouldBe "[a0]"
+
+        "return a string representation when some properties provided" in {
+          val context = new Context()
+          context.add(isFriendOf)
+
+          val relationship = Relationship(isFriendOf, 'since :: HNil)
+
+          relationship.toQuery(context) shouldBe "[a0]"
+
         }
       }
     }

@@ -29,7 +29,8 @@ class MatchesTest extends WordSpec with Matchers {
       implicit val context: Context = new Context()
 
       val matches = new Matches(person -| worksIn |-> department)
-      matches.toQuery(context) shouldBe "MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WorksIn {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})"
+      matches.toQuery(context) shouldBe "MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})"
+
     }
     "provide MATCH for a path in context" in {
       implicit val context: Context = new Context()

@@ -4,6 +4,7 @@ import com.agrim.scala.cypherDSL.spec.implicits.QueryProvider
 
 object TestClasses {
   case class Person(id: String, name: String, age: Int)
+  case class IsFriendOf(since: Int, lastConnectedOn: String)
   case class Department(id: String, name: String)
   case class LocatedIn()
   case class Region(name: String)

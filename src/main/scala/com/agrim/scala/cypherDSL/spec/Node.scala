@@ -18,6 +18,9 @@ private[spec] sealed abstract class CypherEntity[T <: Product: QueryProvider, H 
         getQueryBasedOnProperties(id)
       }
   }
+
+  def label: String = element.getClass.getSimpleName
+
   private def getQueryBasedOnProperties(id: String)(implicit context: Context) = {
     val matchers = properties match {
       case _: HNil => queryProvider.getMatchers(element)
@@ -29,7 +32,7 @@ private[spec] sealed abstract class CypherEntity[T <: Product: QueryProvider, H 
   private def getIdentifierOnlyQuery(id: String): String = makeQuery(id)
 
   private def makeExpandedQuery(id: String, parts: Seq[String]) = {
-    val repr = s"$id:${element.getClass.getSimpleName} {${parts.mkString(",")}}"
+    val repr = s"$id:$label {${parts.mkString(",")}}"
     makeQuery(repr)
   }
 
@@ -41,9 +44,22 @@ private[cypherDSL] case class Node[T <: Product: QueryProvider, H <: HList](elem
     extends CypherEntity(element, properties) {
   override def toQuery(context: Context = new Context()): String = s"(${super.toQuery(context)})"
 }
+
 private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
     implicit
     i0: ToTraversable.Aux[H, List, Symbol])
     extends CypherEntity(element, properties) {
   override def toQuery(context: Context = new Context()): String = s"[${super.toQuery(context)}]"
+  private def toUpperSnakeCase(label: String): String = {
+    label
+      .flatMap(char => {
+        if (char.isUpper) Seq("_", char)
+        else Seq(char)
+      })
+      .mkString
+      .stripPrefix("_")
+      .toUpperCase
+  }
+  override def label: String = toUpperSnakeCase(super.label)
+
 }
