@@ -2,6 +2,8 @@
 
 A type safe DSL for writing Cypher Query Language in Scala.
 
+Cypher spec: https://neo4j.com/docs/cypher-refcard/current/
+
 ###### Samples
 ```scala
 //sample domain models
