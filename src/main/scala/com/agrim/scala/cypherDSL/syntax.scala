@@ -43,9 +43,29 @@ object syntax {
     def <-|[U <: Product, UH <: HList](rel: U)(implicit qpU: QueryProvider[U], qpT: QueryProvider[T]) =
       new Path(PathLink(None, Node(element, HNil), Some("<-")), PathLink(None, Relationship(rel, HNil), None))
 
+    def <-|*(range: Range)(implicit qpT: QueryProvider[T]) = {
+      implicit val queryProvider = QueryProvider.optional[CypherRange]
+      new Path(PathLink(None, Node(element, HNil), Some("<-")),
+               PathLink(None, VariableLengthRelationship(CypherRange(range), HNil), None))
+    }
+    def <-|*()(implicit qpT: QueryProvider[T]) = {
+      implicit val queryProvider = QueryProvider.optional[CypherRange]
+      new Path(PathLink(None, Node(element, HNil), Some("<-")),
+               PathLink(None, VariableLengthRelationship(CypherRange.empty, HNil), None))
+    }
     def -|(rel: Path)(implicit qpT: QueryProvider[T]) =
       new Path(PathLink(None, Node(element, HNil), Some("-")))
 
+    def -|*(range: Range)(implicit qpT: QueryProvider[T]) = {
+      implicit val queryProvider = QueryProvider.optional[CypherRange]
+      new Path(PathLink(None, Node(element, HNil), Some("-")),
+               PathLink(None, VariableLengthRelationship(CypherRange(range), HNil), None))
+    }
+    def -|*()(implicit qpT: QueryProvider[T]) = {
+      implicit val queryProvider = QueryProvider.optional[CypherRange]
+      new Path(PathLink(None, Node(element, HNil), Some("-")),
+               PathLink(None, VariableLengthRelationship(CypherRange.empty, HNil), None))
+    }
     def -|[U <: Product, UH <: HList](rel: U)(implicit qpU: QueryProvider[U], qpT: QueryProvider[T]) =
       new Path(PathLink(None, Node(element, HNil), Some("-")), PathLink(None, Relationship(rel, HNil), None))
   }

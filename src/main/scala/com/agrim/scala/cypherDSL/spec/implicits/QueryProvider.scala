@@ -12,8 +12,18 @@ private[cypherDSL] trait QueryProvider[T <: Product] {
 }
 
 private[cypherDSL] object QueryProvider {
-  def apply[T <: Product](implicit queryProvider: QueryProvider[T], context: Context): QueryProvider[T] =
+  def apply[T <: Product](implicit queryProvider: QueryProvider[T]): QueryProvider[T] =
     queryProvider
+
+  def optional[T <: Product](implicit queryProvider: QueryProvider[T]): QueryProvider[Option[T]] =
+    new QueryProvider[Option[T]] {
+      override def getMatchers(element: Option[T])(implicit context: Context): Seq[String] =
+        element.map(e => queryProvider.getMatchers(e)).getOrElse(Seq.empty)
+      override def getMatchers[U <: HList](element: Option[T], columns: U)(
+          implicit context: Context,
+          i0: ToTraversable.Aux[U, List, Symbol]): Seq[String] =
+        element.map(e => queryProvider.getMatchers(e, columns)).getOrElse(Seq.empty)
+    }
 
   implicit def makeQueryProvider[T <: Product, H <: HList, K <: HList](
       implicit
