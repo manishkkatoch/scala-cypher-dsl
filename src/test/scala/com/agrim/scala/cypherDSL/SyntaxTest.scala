@@ -1,6 +1,6 @@
 package com.agrim.scala.cypherDSL
 
-import com.agrim.scala.cypherDSL.spec.Context
+import com.agrim.scala.cypherDSL.spec.{Context, Path}
 import com.agrim.scala.cypherDSL.spec.utils.Random._
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses.ImplicitCache._
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses._
@@ -48,6 +48,16 @@ class SyntaxTest extends WordSpec with Matchers {
         val path = person -| worksIn |-> department
         path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})"
       }
+      "provide (A)-[*n..m]->(B) grammar" in {
+        val context: Context = new Context()
+        val path: Path       = person -|* (1 to 4) |-> department
+        path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[*1..4]->(a1:Department {id: {a1_id},name: {a1_name}})"
+      }
+      "provide (A)-[*]->(B) grammar" in {
+        val context: Context = new Context()
+        val path             = person -|* () |-> department
+        path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[*]->(a1:Department {id: {a1_id},name: {a1_name}})"
+      }
       "provide (A) <-[R]- (B) grammar" in {
         implicit val context: Context = new Context()
 
@@ -90,6 +100,11 @@ class SyntaxTest extends WordSpec with Matchers {
         val path = person <-| worksIn |- department <-| locatedIn |- region --> person2
         path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})<-[a3:LOCATED_IN {}]-(a4:Region {name: {a4_name}})-->(a5:Person {id: {a5_id},name: {a5_name},age: {a5_age}})"
       }
+      "provide (A)<-[*]-(B)<-[*1..5]-(A2)-[*]->(C) grammar" in {
+        val context = new Context()
+        val path    = person <-|* () |- department <-|* (1 to 5) |- region -|* () |-> person2
+        path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[*]-(a1:Department {id: {a1_id},name: {a1_name}})<-[*1..5]-(a2:Region {name: {a2_name}})-[*]->(a3:Person {id: {a3_id},name: {a3_name},age: {a3_age}})"
+      }
     }
     "when in context" should {
       implicit val context: Context = new Context()
@@ -121,6 +136,14 @@ class SyntaxTest extends WordSpec with Matchers {
           val path = person -| worksIn |-> department
           path.toQuery(context) shouldBe "(a0)-[a2]->(a1)"
         }
+        "provide (A)-[*n..m]->(B) grammar" in {
+          val path: Path = person -|* (1 to 4) |-> department
+          path.toQuery(context) shouldBe "(a0)-[*1..4]->(a1)"
+        }
+        "provide (A)-[*]->(B) grammar" in {
+          val path = person -|* () |-> department
+          path.toQuery(context) shouldBe "(a0)-[*]->(a1)"
+        }
         "provide (A)<-[R]-(B) grammar" in {
           val path = person <-| worksIn |- department
           path.toQuery(context) shouldBe "(a0)<-[a2]-(a1)"
@@ -149,6 +172,10 @@ class SyntaxTest extends WordSpec with Matchers {
           val path = person <-| worksIn |- department <-| locatedIn |- region --> person2
           path.toQuery(context) shouldBe "(a0)<-[a2]-(a1)<-[a3]-(a4)-->(a6)"
         }
+        "provide (A)<-[*]-(B)<-[*1..5]-(A2)-[*]->(C) grammar" in {
+          val path = person <-|* () |- department <-|* (1 to 5) |- region -|* () |-> person2
+          path.toQuery(context) shouldBe "(a0)<-[*]-(a1)<-[*1..5]-(a4)-[*]->(a6)"
+        }
       }
     }
     "V1" should {
@@ -175,6 +202,17 @@ class SyntaxTest extends WordSpec with Matchers {
           .RETURN(person -> "worker", department -> "dept")
           .toQuery(new Context()) shouldBe
           """MATCH (a0:Person {name: {a0_name}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})
+            |RETURN a0 as worker,a2 as dept""".stripMargin
+      }
+      "provide multi match-query for a path" in {
+        val personName = person('name)
+        cypher
+          .MATCH(personName -| worksIn |-> department)
+          .MATCH(department -|* () |-> region)
+          .RETURN(person -> "worker", department -> "dept")
+          .toQuery(new Context()) shouldBe
+          """MATCH (a0:Person {name: {a0_name}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})
+            |MATCH (a2)-[*]->(a3:Region {name: {a3_name}})
             |RETURN a0 as worker,a2 as dept""".stripMargin
       }
 

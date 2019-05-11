@@ -39,10 +39,26 @@ private[spec] sealed abstract class CypherEntity[T <: Product: QueryProvider, H 
   private def makeQuery(repr: String) = s"$repr"
 }
 
+private[cypherDSL] case class CypherRange(start: Int, end: Int) {
+  def isEmpty: Boolean = (end - start) == 0
+  def toQuery: String  = if (isEmpty) "" else s"$start..$end"
+}
+object CypherRange {
+  val empty                            = CypherRange(0, 0)
+  def apply(range: Range): CypherRange = CypherRange(range.start, range.end)
+}
 private[cypherDSL] case class Node[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
     implicit i0: ToTraversable.Aux[H, List, Symbol])
     extends CypherEntity(element, properties) {
   override def toQuery(context: Context = new Context()): String = s"(${super.toQuery(context)})"
+}
+
+private[cypherDSL] case class VariableLengthRelationship[H <: HList](range: CypherRange, properties: H = HNil)(
+    implicit
+    queryProvider: QueryProvider[CypherRange],
+    i0: ToTraversable.Aux[H, List, Symbol])
+    extends CypherEntity(range, properties) {
+  override def toQuery(context: Context = new Context()): String = s"[*${range.toQuery}]"
 }
 
 private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
