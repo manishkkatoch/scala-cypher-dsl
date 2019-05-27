@@ -41,12 +41,16 @@ private[spec] sealed abstract class CypherEntity[T <: Product: QueryProvider, H 
 
 private[cypherDSL] case class CypherRange(start: Int, end: Int) {
   def isEmpty: Boolean = (end - start) == 0
-  def toQuery: String  = if (isEmpty) "" else s"$start..$end"
+
+  def toQuery: String = if (isEmpty) "" else s"$start..$end"
 }
+
 object CypherRange {
-  val empty                            = CypherRange(0, 0)
+  val empty = CypherRange(0, 0)
+
   def apply(range: Range): CypherRange = CypherRange(range.start, range.end)
 }
+
 private[cypherDSL] case class Node[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
     implicit i0: ToTraversable.Aux[H, List, Symbol])
     extends CypherEntity(element, properties) {
@@ -61,11 +65,36 @@ private[cypherDSL] case class VariableLengthRelationship[H <: HList](range: Cyph
   override def toQuery(context: Context = new Context()): String = s"[*${range.toQuery}]"
 }
 
-private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
-    implicit
-    i0: ToTraversable.Aux[H, List, Symbol])
-    extends CypherEntity(element, properties) {
-  override def toQuery(context: Context = new Context()): String = s"[${super.toQuery(context)}]"
+private[cypherDSL] case class OrRelationship[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
+    implicit i0: ToTraversable.Aux[H, List, Symbol])
+    extends CypherEntity(element, properties)
+    with UpperCasedLabel {
+  override def toQuery(context: Context = new Context()): String = s"${super.toQuery(context)}"
+
+  override def label: String = upperCased(super.label)
+}
+
+private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HList](
+    element: T,
+    properties: H,
+    orRels: List[OrRelationship[_, _]] = List.empty)(implicit
+                                                     i0: ToTraversable.Aux[H, List, Symbol])
+    extends CypherEntity(element, properties)
+    with UpperCasedLabel {
+
+  override def toQuery(context: Context = new Context()): String = {
+    val orRelsString = orRels.map(_.toQuery(context)).mkString("|")
+    s"[${super.toQuery(context)}${if (orRelsString.nonEmpty) "|" + orRelsString else ""}]"
+  }
+  override def label: String = upperCased(super.label)
+
+  def or[U <: Product: QueryProvider, UH <: HList](orElement: U, properties: UH)(
+      implicit i1: ToTraversable.Aux[UH, List, Symbol]) = {
+    copy(orRels = OrRelationship(orElement, properties) :: orRels)
+  }
+}
+
+private[spec] trait UpperCasedLabel {
   private def toUpperSnakeCase(label: String): String = {
     label
       .flatMap(char => {
@@ -76,6 +105,6 @@ private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HLi
       .stripPrefix("_")
       .toUpperCase
   }
-  override def label: String = toUpperSnakeCase(super.label)
 
+  def upperCased(string: String): String = toUpperSnakeCase(string)
 }

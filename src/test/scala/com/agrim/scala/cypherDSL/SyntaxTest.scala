@@ -42,11 +42,21 @@ class SyntaxTest extends WordSpec with Matchers {
         val path = person -| worksIn |- department
         path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})"
       }
+      "provide (A)-[R|S]-(B) grammar" in {
+        implicit val context: Context = new Context()
+        val path                      = person -| worksIn | headOfDepartment |- department
+        path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a2:WORKS_IN {sinceDays: {a2_sinceDays}}|a1:HEAD_OF_DEPARTMENT {id: {a1_id},name: {a1_name}}]-(a3:Department {id: {a3_id},name: {a3_name}})"
+      }
       "provide (A) -[R]-> (B) grammar" in {
         implicit val context: Context = new Context()
 
         val path = person -| worksIn |-> department
         path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})"
+      }
+      "provide (A)-[R|S]->(B) grammar" in {
+        implicit val context: Context = new Context()
+        val path                      = person -| worksIn | headOfDepartment |-> department
+        path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a2:WORKS_IN {sinceDays: {a2_sinceDays}}|a1:HEAD_OF_DEPARTMENT {id: {a1_id},name: {a1_name}}]->(a3:Department {id: {a3_id},name: {a3_name}})"
       }
       "provide (A)-[*n..m]->(B) grammar" in {
         val context: Context = new Context()
@@ -63,6 +73,12 @@ class SyntaxTest extends WordSpec with Matchers {
 
         val path = person <-| worksIn |- department
         path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]-(a2:Department {id: {a2_id},name: {a2_name}})"
+      }
+      "provide (A) <-[R|S]- (B) grammar" in {
+        implicit val context: Context = new Context()
+
+        val path = person <-| worksIn | headOfDepartment |- department
+        path.toQuery(context) shouldBe "(a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})<-[a2:WORKS_IN {sinceDays: {a2_sinceDays}}|a1:HEAD_OF_DEPARTMENT {id: {a1_id},name: {a1_name}}]-(a3:Department {id: {a3_id},name: {a3_name}})"
       }
       "provide (A)-[R]-(B)-[R2]-(A2) grammar" in {
         implicit val context = new Context()
@@ -135,6 +151,10 @@ class SyntaxTest extends WordSpec with Matchers {
         "provide (A)-[R]->(B) grammar" in {
           val path = person -| worksIn |-> department
           path.toQuery(context) shouldBe "(a0)-[a2]->(a1)"
+        }
+        "provide (A)-[R|S]->(B) grammar" in {
+          val path = person -| worksIn | headOfDepartment |-> department
+          path.toQuery(context) shouldBe "(a0)-[a2|a5]->(a1)"
         }
         "provide (A)-[*n..m]->(B) grammar" in {
           val path: Path = person -|* (1 to 4) |-> department
