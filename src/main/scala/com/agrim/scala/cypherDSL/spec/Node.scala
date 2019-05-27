@@ -4,7 +4,7 @@ import com.agrim.scala.cypherDSL.spec.implicits.QueryProvider
 import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 
-private[cypherDSL] sealed class CypherEntity[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
+private[spec] sealed abstract class CypherEntity[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
     implicit i0: ToTraversable.Aux[H, List, Symbol]) {
 
   private val queryProvider = implicitly[QueryProvider[T]]
