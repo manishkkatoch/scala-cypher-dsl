@@ -1,6 +1,5 @@
 package com.agrim.scala.cypherDSL.spec
 
-import com.agrim.scala.cypherDSL.spec.implicits.QueryProvider
 import shapeless.{HList, HNil}
 import shapeless.ops.hlist.ToTraversable
 
@@ -8,6 +7,20 @@ private[cypherDSL] sealed trait Clause {
   def toQuery(context: Context): String
 }
 
+private[cypherDSL] class Skips(count: Int) extends Clause {
+  override def toQuery(context: Context): String = s"SKIP $count"
+}
+private[cypherDSL] object Skips {
+  def apply(count: Int) = new Skips(count)
+}
+
+private[cypherDSL] class Limits(count: Int) extends Clause {
+  override def toQuery(context: Context): String = s"LIMIT $count"
+}
+
+private[cypherDSL] object Limits {
+  def apply(count: Int) = new Limits(count)
+}
 private[cypherDSL] class Matches(path: Path) extends Clause {
   override def toQuery(context: Context = new Context()): String = s"MATCH ${path.toQuery(context)}"
 }
@@ -43,10 +56,6 @@ private[cypherDSL] object OptionallyMatches {
 }
 
 private case class ReturnAliasing(node: Product, alias: Option[String])
-private object ReturnAliasing {
-  def apply(product: Product): ReturnAliasing = ReturnAliasing(product, None)
-}
-
 private[cypherDSL] class Returns(elements: ReturnAliasing*) extends Clause {
 
   private val errorMessage = "One or more of the elements to be returned are not in Context!"
