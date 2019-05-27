@@ -23,6 +23,9 @@ object syntax {
       def MATCH(element: Path): Statement = {
         statement.copy(readingClause = statement.readingClause :+ Matches(element))
       }
+      def OPTIONAL_MATCH(element: Path): Statement = {
+        statement.copy(readingClause = statement.readingClause :+ OptionallyMatches(element))
+      }
 
       def RETURN[T <: Product](elements: T*): Statement = {
         statement.copy(returnClause = Returns(elements: _*))

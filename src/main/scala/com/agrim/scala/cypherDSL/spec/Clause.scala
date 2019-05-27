@@ -25,6 +25,23 @@ private[cypherDSL] object Matches {
   def apply(path: Path) = new Matches(path)
 }
 
+private[cypherDSL] class OptionallyMatches(path: Path) extends Clause {
+  override def toQuery(context: Context = new Context()): String = s"OPTIONAL MATCH ${path.toQuery(context)}"
+}
+private[cypherDSL] object OptionallyMatches {
+  def apply[T <: Product, TH <: HList](element: Node[T, TH])(
+      implicit i0: ToTraversable.Aux[TH, List, Symbol]): OptionallyMatches = {
+    val path = new Path(PathLink(None, element, None))
+    new OptionallyMatches(path)
+  }
+  def apply[T <: Product, TH <: HList](element: T)(implicit queryProvider: QueryProvider[T],
+                                                   i0: ToTraversable.Aux[TH, List, Symbol]): OptionallyMatches = {
+    val path = new Path(PathLink(None, Node(element, HNil), None))
+    new OptionallyMatches(path)
+  }
+  def apply(path: Path) = new OptionallyMatches(path)
+}
+
 private case class ReturnAliasing(node: Product, alias: Option[String])
 private object ReturnAliasing {
   def apply(product: Product): ReturnAliasing = ReturnAliasing(product, None)

@@ -235,6 +235,17 @@ class SyntaxTest extends WordSpec with Matchers {
             |MATCH (a2)-[*]->(a3:Region {name: {a3_name}})
             |RETURN a0 as worker,a2 as dept""".stripMargin
       }
+      "provide optional match query for a path" in {
+        val personName = person('name)
+        cypher
+          .MATCH(personName -| worksIn |-> department)
+          .OPTIONAL_MATCH(department -|* () |-> region)
+          .RETURN(person -> "worker", department -> "dept")
+          .toQuery(new Context()) shouldBe
+          """MATCH (a0:Person {name: {a0_name}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})
+            |OPTIONAL MATCH (a2)-[*]->(a3:Region {name: {a3_name}})
+            |RETURN a0 as worker,a2 as dept""".stripMargin
+      }
 
     }
   }
