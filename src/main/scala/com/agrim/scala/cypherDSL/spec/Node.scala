@@ -1,6 +1,5 @@
 package com.agrim.scala.cypherDSL.spec
 
-import com.agrim.scala.cypherDSL.spec.implicits.QueryProvider
 import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 

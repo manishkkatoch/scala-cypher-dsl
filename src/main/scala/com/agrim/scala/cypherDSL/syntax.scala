@@ -1,7 +1,6 @@
 package com.agrim.scala.cypherDSL
 
-import com.agrim.scala.cypherDSL.spec._
-import com.agrim.scala.cypherDSL.spec.implicits.QueryProvider
+import com.agrim.scala.cypherDSL.spec.{QueryProvider, _}
 import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 
@@ -12,22 +11,48 @@ object syntax {
 
     implicit class RichStatement(statement: Statement) {
       def MATCH[T <: Product](element: T)(implicit queryProvider: QueryProvider[T]): Statement = {
-        statement.copy(readingClause = statement.readingClause :+ Matches(element))
+        statement.copy(clauses = statement.clauses :+ Matches(element))
       }
 
       def MATCH[T <: Product, TH <: HList](element: Node[T, TH])(implicit queryProvider: QueryProvider[T],
                                                                  i0: ToTraversable.Aux[TH, List, Symbol]): Statement = {
-        statement.copy(readingClause = statement.readingClause :+ Matches(element))
+        statement.copy(clauses = statement.clauses :+ Matches(element))
       }
 
       def MATCH(element: Path): Statement = {
-        statement.copy(readingClause = statement.readingClause :+ Matches(element))
+        statement.copy(clauses = statement.clauses :+ Matches(element))
+      }
+      def OPTIONAL_MATCH[T <: Product](element: T)(implicit queryProvider: QueryProvider[T]): Statement = {
+        statement.copy(clauses = statement.clauses :+ OptionallyMatches(element))
+      }
+      def OPTIONAL_MATCH[T <: Product, TH <: HList](element: Node[T, TH])(
+          implicit queryProvider: QueryProvider[T],
+          i0: ToTraversable.Aux[TH, List, Symbol]): Statement = {
+        statement.copy(clauses = statement.clauses :+ OptionallyMatches(element))
+      }
+      def OPTIONAL_MATCH(element: Path): Statement = {
+        statement.copy(clauses = statement.clauses :+ OptionallyMatches(element))
+      }
+
+      def SKIP(count: Int): Statement = {
+        statement.copy(clauses = statement.clauses :+ Skips(count))
+      }
+
+      def LIMIT(count: Int): Statement = {
+        statement.copy(clauses = statement.clauses :+ Limits(count))
       }
 
       def RETURN[T <: Product](elements: T*): Statement = {
-        statement.copy(returnClause = Returns(elements: _*))
+        statement.copy(clauses = statement.clauses :+ Returns(elements: _*))
+      }
+      def ORDER_BY[T <: Product](elements: T*): Statement = {
+        statement.copy(clauses = statement.clauses :+ OrdersBy(elements: _*))
+      }
+      def ORDER_BY_DESC[T <: Product](elements: T*): Statement = {
+        statement.copy(clauses = statement.clauses :+ OrdersBy(true, elements: _*))
       }
     }
+
   }
 
   implicit class RichProduct[T <: Product, TH <: HList](element: T) {
@@ -48,24 +73,25 @@ object syntax {
       new Path(PathLink(None, Node(element, HNil), Some("<-")),
                PathLink(None, VariableLengthRelationship(CypherRange(range), HNil), None))
     }
+
     def <-|*()(implicit qpT: QueryProvider[T]) = {
       implicit val queryProvider = QueryProvider.optional[CypherRange]
       new Path(PathLink(None, Node(element, HNil), Some("<-")),
                PathLink(None, VariableLengthRelationship(CypherRange.empty, HNil), None))
     }
-    def -|(rel: Path)(implicit qpT: QueryProvider[T]) =
-      new Path(PathLink(None, Node(element, HNil), Some("-")))
 
     def -|*(range: Range)(implicit qpT: QueryProvider[T]) = {
       implicit val queryProvider = QueryProvider.optional[CypherRange]
       new Path(PathLink(None, Node(element, HNil), Some("-")),
                PathLink(None, VariableLengthRelationship(CypherRange(range), HNil), None))
     }
+
     def -|*()(implicit qpT: QueryProvider[T]) = {
       implicit val queryProvider = QueryProvider.optional[CypherRange]
       new Path(PathLink(None, Node(element, HNil), Some("-")),
                PathLink(None, VariableLengthRelationship(CypherRange.empty, HNil), None))
     }
+
     def -|[U <: Product, UH <: HList](rel: U)(implicit qpU: QueryProvider[U], qpT: QueryProvider[T]) =
       new Path(PathLink(None, Node(element, HNil), Some("-")), PathLink(None, Relationship(rel, HNil), None))
   }
@@ -128,34 +154,13 @@ object syntax {
   }
 
   implicit class EnrichedRichNode[T <: Product, TH <: HList](element: Node[T, TH]) {
-    def <-|[U <: Product, UH <: HList](rel: U)(implicit queryProvider: QueryProvider[U]) =
-      new Path(PathLink(None, element, Some("<-")), PathLink(None, Relationship(rel, HNil), None))
-
-    def <-|[U <: Product, UH <: HList](rel: Node[U, UH])(implicit
-                                                         queryProvider: QueryProvider[U],
-                                                         i0: ToTraversable.Aux[UH, List, Symbol]) =
-      new Path(PathLink(None, element, Some("<-")), PathLink(None, Relationship(rel.element, rel.properties), None))
-
     def -|[U <: Product, UH <: HList](rel: U)(implicit queryProvider: QueryProvider[U]) =
       new Path(PathLink(None, element, Some("-")), PathLink(None, Relationship(rel, HNil), None))
 
-    def --[U <: Product, UH <: HList](rel: U)(implicit queryProvider: QueryProvider[U]) =
-      new Path(PathLink(None, element, Some("-")), PathLink(Some("-"), Node(rel, HNil), None))
-
-    def --[U <: Product, UH <: HList](rel: Node[U, UH])(implicit context: Context) =
-      new Path(PathLink(None, element, Some("-")), PathLink(Some("-"), rel, None))
-
-    def -->[U <: Product, UH <: HList](rel: U)(implicit queryProvider: QueryProvider[U]) =
-      new Path(PathLink(None, element, Some("-")), PathLink(Some("->"), Node(rel, HNil), None))
-
-    def -->[U <: Product, UH <: HList](rel: Node[U, UH])(implicit context: Context) =
-      new Path(PathLink(None, element, Some("-")), PathLink(Some("->"), rel, None))
-
-    def <--[U <: Product, UH <: HList](rel: U)(implicit queryProvider: QueryProvider[U]) =
-      new Path(PathLink(None, element, Some("<-")), PathLink(Some("-"), Node(rel, HNil), None))
-
-    def <--[U <: Product, UH <: HList](rel: Node[U, UH])(implicit context: Context) =
-      new Path(PathLink(None, element, Some("<-")), PathLink(Some("-"), rel, None))
+    def -|[U <: Product, UH <: HList](rel: Node[U, UH])(implicit
+                                                        queryProvider: QueryProvider[U],
+                                                        i0: ToTraversable.Aux[UH, List, Symbol]) =
+      new Path(PathLink(None, element, Some("-")), PathLink(None, Relationship(rel.element, rel.properties), None))
   }
 
 }

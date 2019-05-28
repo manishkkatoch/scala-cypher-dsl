@@ -1,6 +1,6 @@
 package com.agrim.scala.cypherDSL.spec.utils
 
-import com.agrim.scala.cypherDSL.spec.implicits.QueryProvider
+import com.agrim.scala.cypherDSL.spec.QueryProvider
 
 object TestClasses {
   case class Person(id: String, name: String, age: Int)
@@ -9,6 +9,16 @@ object TestClasses {
   case class LocatedIn()
   case class Region(name: String)
   case class HeadOfDepartment(id: String, name: String)
+  case class TenPropClass(prop1: String,
+                          prop2: String,
+                          prop3: Int,
+                          prop4: Int,
+                          prop5: String,
+                          prop6: String,
+                          prop7: String,
+                          prop8: Int,
+                          prop9: Int,
+                          prop10: String)
   case class WorksIn(sinceDays: Int)
 
   object ImplicitCache {

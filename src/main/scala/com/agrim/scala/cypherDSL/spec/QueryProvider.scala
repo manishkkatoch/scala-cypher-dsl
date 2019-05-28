@@ -1,6 +1,5 @@
-package com.agrim.scala.cypherDSL.spec.implicits
+package com.agrim.scala.cypherDSL.spec
 
-import com.agrim.scala.cypherDSL.spec.Context
 import shapeless.ops.hlist.ToTraversable
 import shapeless.ops.record.Keys
 import shapeless.{HList, LabelledGeneric}
