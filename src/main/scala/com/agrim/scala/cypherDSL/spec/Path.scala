@@ -12,6 +12,7 @@ private[cypherDSL] class Path(val pathLinks: PathLink[_, _ <: HList]*) {
     val newRelElement = lastLink.element.asInstanceOf[Relationship[T, TH]].or(rel, HNil)
     new Path(pathLinks.take(pathLinks.length - 1) :+ PathLink(lastLink.leftLink, newRelElement, lastLink.rightLink): _*)
   }
+
   def |->[U <: Product, UH <: HList](rel: U)(implicit queryProvider: QueryProvider[U]): Path = {
     new Path(pathLinks :+ PathLink(Some("->"), Node(rel, HNil), None): _*)
   }
