@@ -1,10 +1,8 @@
 package com.agrim.scala.cypherDSL.spec
 
+import com.agrim.scala.cypherDSL.spec.Utils._
 import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
-import Utils._
-
-import scala.util.Try
 
 private[cypherDSL] sealed trait Clause {
   def toQuery(context: Context): String
@@ -13,7 +11,6 @@ private[cypherDSL] sealed trait Clause {
 private[cypherDSL] class Skips(count: Int) extends Clause {
   override def toQuery(context: Context): String = s"SKIP $count"
 }
-
 private[cypherDSL] object Skips {
   def apply(count: Int) = new Skips(count)
 }
@@ -21,7 +18,6 @@ private[cypherDSL] object Skips {
 private[cypherDSL] class Limits(count: Int) extends Clause {
   override def toQuery(context: Context): String = s"LIMIT $count"
 }
-
 private[cypherDSL] object Limits {
   def apply(count: Int) = new Limits(count)
 }
@@ -49,14 +45,12 @@ private[cypherDSL] object Matches {
 private[cypherDSL] class OptionallyMatches(path: Path) extends Clause {
   override def toQuery(context: Context = new Context()): String = s"OPTIONAL MATCH ${path.toQuery(context)}"
 }
-
 private[cypherDSL] object OptionallyMatches {
   def apply[T <: Product, TH <: HList](element: Node[T, TH])(
       implicit i0: ToTraversable.Aux[TH, List, Symbol]): OptionallyMatches = {
     val path = new Path(PathLink(None, element, None))
     new OptionallyMatches(path)
   }
-
   def apply[T <: Product, TH <: HList](element: T)(implicit queryProvider: QueryProvider[T],
                                                    i0: ToTraversable.Aux[TH, List, Symbol]): OptionallyMatches = {
     val path = new Path(PathLink(None, Node(element, HNil), None))
@@ -66,36 +60,17 @@ private[cypherDSL] object OptionallyMatches {
   def apply(path: Path) = new OptionallyMatches(path)
 }
 
-private case class ReturnAliasing(node: Product, alias: Option[String])
-
-private[cypherDSL] class Returns(elements: ReturnAliasing*) extends Clause {
-
-  private val errorMessage                    = "One or more of the elements to be returned are not in Context!"
+private[cypherDSL] trait ElementPropertyExtractingAndAliasing {
   private val tooManyPropertiesToAliasMessage = "Alias one property at a time!"
 
-  @throws[NoSuchElementException]
-  def toQuery(context: Context = new Context()): String = {
-    val ids = elements
-      .map(element => {
-        val (el, properties) = getElementAndProperties(element)
-        context
-          .get(el)
-          .map(identifier => makeAliasedReturnString(identifier, properties, element.alias))
-          .getOrElse(throw new NoSuchElementException(errorMessage))
-      })
-      .mkString(",")
-
-    if (ids.nonEmpty) s"RETURN $ids" else ""
-  }
-
-  private def getElementAndProperties(returnAliasing: ReturnAliasing): (Product, List[String]) =
-    returnAliasing.node match {
+  def getElementAndProperties(element: Product): (Product, List[String]) =
+    element match {
       case s: Node[_, _] => (s.element, toList(s.properties))
       case s             => (s, List.empty[String])
     }
 
   @throws[AssertionError]
-  private def makeAliasedReturnString(identifier: String, properties: List[String], alias: Option[String]) = {
+  def makeAliasedString(identifier: String, properties: List[String], alias: Option[String]): String = {
     if (properties.length > 1 && alias.isDefined) {
       throw new AssertionError(tooManyPropertiesToAliasMessage)
     }
@@ -105,22 +80,42 @@ private[cypherDSL] class Returns(elements: ReturnAliasing*) extends Clause {
   }
 }
 
-private[cypherDSL] object Returns {
-
-  private def makeReturnAliasing(list: List[Product]): Seq[ReturnAliasing] = list match {
+private case class AliasedProduct(node: Product, alias: Option[String])
+private object AliasedProduct {
+  def makeAliasedProduct(list: List[Product]): Seq[AliasedProduct] = list match {
     case Nil                                 => List.empty
-    case (s: (Product, String)) :: remaining => ReturnAliasing(s._1, Option(s._2)) +: makeReturnAliasing(remaining)
-    case (s: Product) :: remaining           => ReturnAliasing(s, None) +: makeReturnAliasing(remaining)
+    case (s: (Product, String)) :: remaining => AliasedProduct(s._1, Option(s._2)) +: makeAliasedProduct(remaining)
+    case (s: Product) :: remaining           => AliasedProduct(s, None) +: makeAliasedProduct(remaining)
   }
+}
 
-  def apply(elements: Product*): Returns = new Returns(makeReturnAliasing(elements.toList): _*)
+private[cypherDSL] class Returns(elements: AliasedProduct*) extends Clause with ElementPropertyExtractingAndAliasing {
+  private val errorMessage = "One or more of the elements to be returned are not in Context!"
 
-  val empty = Returns(Seq.empty: _*)
+  @throws[NoSuchElementException]
+  def toQuery(context: Context = new Context()): String = {
+    val ids = elements
+      .map(element => {
+        val (el, properties) = getElementAndProperties(element.node)
+        context
+          .get(el)
+          .map(identifier => makeAliasedString(identifier, properties, element.alias))
+          .getOrElse(throw new NoSuchElementException(errorMessage))
+      })
+      .mkString(",")
+
+    if (ids.nonEmpty) s"RETURN $ids" else ""
+  }
+}
+private[cypherDSL] object Returns {
+  def apply(elements: Product*): Returns = new Returns(AliasedProduct.makeAliasedProduct(elements.toList): _*)
+  val empty                              = Returns(Seq.empty: _*)
 }
 
 private case class OrderingProduct(element: Product)
-
-private[cypherDSL] class OrdersBy(descendingOrder: Boolean, elements: OrderingProduct*) extends Clause {
+private[cypherDSL] class OrdersBy(descendingOrder: Boolean, elements: OrderingProduct*)
+    extends Clause
+    with ElementPropertyExtractingAndAliasing {
   private val errorMessage = "One or more of the elements to be returned are not in Context!"
 
   private def makeAliasedReturnString(identifier: String, properties: List[String]): String = {
@@ -131,7 +126,7 @@ private[cypherDSL] class OrdersBy(descendingOrder: Boolean, elements: OrderingPr
   override def toQuery(context: Context): String = {
     val ids = elements
       .map(element => {
-        val (el, properties) = getElementAndProperties(element)
+        val (el, properties) = getElementAndProperties(element.element)
         context
           .get(el)
           .map(identifier => makeAliasedReturnString(identifier, properties))
@@ -143,13 +138,7 @@ private[cypherDSL] class OrdersBy(descendingOrder: Boolean, elements: OrderingPr
 
   private def getOrderingString = if (descendingOrder) "DESC" else ""
 
-  private def getElementAndProperties(orderingProduct: OrderingProduct): (Product, List[String]) =
-    orderingProduct.element match {
-      case s: Node[_, _] => (s.element, toList(s.properties))
-      case s             => (s, List.empty[String])
-    }
 }
-
 private[cypherDSL] object OrdersBy {
   private def makeOrderingProduct(list: List[Product]): Seq[OrderingProduct] = list match {
     case Nil                       => List.empty
@@ -162,4 +151,30 @@ private[cypherDSL] object OrdersBy {
     new OrdersBy(descendingOrder, makeOrderingProduct(elements.toList): _*)
 
   val empty = OrdersBy(Seq.empty: _*)
+}
+
+private[cypherDSL] class With(elements: AliasedProduct*) extends Clause with ElementPropertyExtractingAndAliasing {
+  private val errorMessage = "One or more of the elements to be returned are not in Context!"
+
+  @throws[NoSuchElementException]
+  def toQuery(context: Context = new Context()): String = {
+    val ids = elements
+      .map(element => {
+        val (el, properties) = getElementAndProperties(element.node)
+        context
+          .get(el)
+          .map(identifier => {
+            if (element.alias.isDefined) context.update(element.node, element.alias.get)
+            makeAliasedString(identifier, properties, element.alias)
+          })
+          .getOrElse(throw new NoSuchElementException(errorMessage))
+      })
+      .mkString(",")
+
+    if (ids.nonEmpty) s"WITH $ids" else ""
+  }
+}
+private[cypherDSL] object With {
+  def apply(elements: Product*): With = new With(AliasedProduct.makeAliasedProduct(elements.toList): _*)
+  val empty                           = With(Seq.empty: _*)
 }

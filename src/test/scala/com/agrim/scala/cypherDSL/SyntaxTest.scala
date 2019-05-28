@@ -367,6 +367,24 @@ class SyntaxTest extends WordSpec with Matchers {
             |LIMIT 10""".stripMargin
       }
 
+      "provide WITH in query for a path" in {
+        val personName = person('name)
+        cypher
+          .MATCH(personName -| worksIn('sinceDays) |-> department)
+          .OPTIONAL_MATCH(department -|* () |-> region)
+          .WITH(person, region -> "reg")
+          .RETURN(person('name) -> "workerName", department -> "dept", region)
+          .SKIP(5)
+          .LIMIT(10)
+          .toQuery(new Context()) shouldBe
+          """MATCH (a0:Person {name: {a0_name}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})
+            |OPTIONAL MATCH (a2)-[*]->(a3:Region {name: {a3_name}})
+            |WITH a0,a3 as reg
+            |RETURN a0.name as workerName,a2 as dept,reg
+            |SKIP 5
+            |LIMIT 10""".stripMargin
+      }
+
     }
   }
 }

@@ -45,6 +45,11 @@ object syntax {
       def RETURN[T <: Product](elements: T*): Statement = {
         statement.copy(clauses = statement.clauses :+ Returns(elements: _*))
       }
+
+      def WITH[T <: Product](elements: T*): Statement = {
+        statement.copy(clauses = statement.clauses :+ With(elements: _*))
+      }
+
       def ORDER_BY[T <: Product](elements: T*): Statement = {
         statement.copy(clauses = statement.clauses :+ OrdersBy(elements: _*))
       }
