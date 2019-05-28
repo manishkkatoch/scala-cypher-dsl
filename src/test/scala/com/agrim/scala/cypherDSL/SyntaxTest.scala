@@ -6,7 +6,6 @@ import com.agrim.scala.cypherDSL.spec.utils.TestClasses._
 import com.agrim.scala.cypherDSL.spec.{Context, Path}
 import com.agrim.scala.cypherDSL.syntax._
 import org.scalatest.{Matchers, WordSpec}
-import shapeless.HNil
 
 class SyntaxTest extends WordSpec with Matchers {
   private val person: Person                     = randomize[Person]
@@ -330,6 +329,40 @@ class SyntaxTest extends WordSpec with Matchers {
           """MATCH (a0:Person {name: {a0_name}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})
             |OPTIONAL MATCH (a2)-[*]->(a3:Region {name: {a3_name}})
             |RETURN a0 as worker,a2 as dept
+            |SKIP 5
+            |LIMIT 10""".stripMargin
+      }
+      "provide order by return in query for a path" in {
+        val personName = person('name)
+        cypher
+          .MATCH(personName -| worksIn('sinceDays) |-> department)
+          .OPTIONAL_MATCH(department -|* () |-> region)
+          .RETURN(person('name) -> "workerName", department -> "dept")
+          .SKIP(5)
+          .LIMIT(10)
+          .ORDER_BY(person('name, 'age), department)
+          .toQuery(new Context()) shouldBe
+          """MATCH (a0:Person {name: {a0_name}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})
+            |OPTIONAL MATCH (a2)-[*]->(a3:Region {name: {a3_name}})
+            |RETURN a0.name as workerName,a2 as dept
+            |SKIP 5
+            |LIMIT 10
+            |ORDER BY a0.name,a0.age,a2""".stripMargin
+      }
+      "provide order by desc in query for a path" in {
+        val personName = person('name)
+        cypher
+          .MATCH(personName -| worksIn('sinceDays) |-> department)
+          .OPTIONAL_MATCH(department -|* () |-> region)
+          .ORDER_BY_DESC(person('name, 'age), department)
+          .RETURN(person('name) -> "workerName", department -> "dept")
+          .SKIP(5)
+          .LIMIT(10)
+          .toQuery(new Context()) shouldBe
+          """MATCH (a0:Person {name: {a0_name}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})
+            |OPTIONAL MATCH (a2)-[*]->(a3:Region {name: {a3_name}})
+            |ORDER BY a0.name,a0.age,a2 DESC
+            |RETURN a0.name as workerName,a2 as dept
             |SKIP 5
             |LIMIT 10""".stripMargin
       }

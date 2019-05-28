@@ -22,7 +22,9 @@ object syntax {
       def MATCH(element: Path): Statement = {
         statement.copy(clauses = statement.clauses :+ Matches(element))
       }
-
+      def OPTIONAL_MATCH[T <: Product](element: T)(implicit queryProvider: QueryProvider[T]): Statement = {
+        statement.copy(clauses = statement.clauses :+ OptionallyMatches(element))
+      }
       def OPTIONAL_MATCH[T <: Product, TH <: HList](element: Node[T, TH])(
           implicit queryProvider: QueryProvider[T],
           i0: ToTraversable.Aux[TH, List, Symbol]): Statement = {
@@ -42,6 +44,12 @@ object syntax {
 
       def RETURN[T <: Product](elements: T*): Statement = {
         statement.copy(clauses = statement.clauses :+ Returns(elements: _*))
+      }
+      def ORDER_BY[T <: Product](elements: T*): Statement = {
+        statement.copy(clauses = statement.clauses :+ OrdersBy(elements: _*))
+      }
+      def ORDER_BY_DESC[T <: Product](elements: T*): Statement = {
+        statement.copy(clauses = statement.clauses :+ OrdersBy(true, elements: _*))
       }
     }
 
