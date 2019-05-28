@@ -366,6 +366,7 @@ class SyntaxTest extends WordSpec with Matchers {
             |SKIP 5
             |LIMIT 10""".stripMargin
       }
+
       "provide WITH in query for a path" in {
         val personName = person('name)
         cypher
@@ -383,6 +384,7 @@ class SyntaxTest extends WordSpec with Matchers {
             |SKIP 5
             |LIMIT 10""".stripMargin
       }
+
     }
   }
 }

@@ -25,6 +25,7 @@ private[cypherDSL] object Limits {
 private[cypherDSL] class Matches(path: Path) extends Clause {
   override def toQuery(context: Context = new Context()): String = s"MATCH ${path.toQuery(context)}"
 }
+
 private[cypherDSL] object Matches {
   def apply[T <: Product, TH <: HList](element: Node[T, TH])(
       implicit i0: ToTraversable.Aux[TH, List, Symbol]): Matches = {
@@ -50,7 +51,6 @@ private[cypherDSL] object OptionallyMatches {
     val path = new Path(PathLink(None, element, None))
     new OptionallyMatches(path)
   }
-
   def apply[T <: Product, TH <: HList](element: T)(implicit queryProvider: QueryProvider[T],
                                                    i0: ToTraversable.Aux[TH, List, Symbol]): OptionallyMatches = {
     val path = new Path(PathLink(None, Node(element, HNil), None))
@@ -137,6 +137,7 @@ private[cypherDSL] class OrdersBy(descendingOrder: Boolean, elements: OrderingPr
   }
 
   private def getOrderingString = if (descendingOrder) "DESC" else ""
+
 }
 private[cypherDSL] object OrdersBy {
   private def makeOrderingProduct(list: List[Product]): Seq[OrderingProduct] = list match {
