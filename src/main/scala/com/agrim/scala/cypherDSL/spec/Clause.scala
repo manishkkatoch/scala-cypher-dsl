@@ -1,6 +1,5 @@
 package com.agrim.scala.cypherDSL.spec
 
-import com.agrim.scala.cypherDSL.spec.Utils._
 import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 
@@ -60,47 +59,24 @@ private[cypherDSL] object OptionallyMatches {
   def apply(path: Path) = new OptionallyMatches(path)
 }
 
-private[cypherDSL] trait ElementPropertyExtractingAndAliasing {
-  private val tooManyPropertiesToAliasMessage = "Alias one property at a time!"
-
-  def getElementAndProperties(element: Product): (Product, List[String]) =
-    element match {
-      case s: Node[_, _] => (s.element, toList(s.properties))
-      case s             => (s, List.empty[String])
-    }
-
-  @throws[AssertionError]
-  def makeAliasedString(identifier: String, properties: List[String], alias: Option[String]): String = {
-    if (properties.length > 1 && alias.isDefined) {
-      throw new AssertionError(tooManyPropertiesToAliasMessage)
-    }
-    val identifierString = properties.map(p => s"$identifier.$p").mkString(",")
-    val aliasString      = alias.map(a => s" as $a").mkString
-    (if (identifierString.isEmpty) identifier else identifierString) + aliasString
-  }
-}
-
-private case class AliasedProduct(node: Product, alias: Option[String])
-private object AliasedProduct {
-  def makeAliasedProduct(list: List[Product]): Seq[AliasedProduct] = list match {
-    case Nil                                 => List.empty
-    case (s: (Product, String)) :: remaining => AliasedProduct(s._1, Option(s._2)) +: makeAliasedProduct(remaining)
-    case (s: Product) :: remaining           => AliasedProduct(s, None) +: makeAliasedProduct(remaining)
-  }
-}
-
-private[cypherDSL] class Returns(elements: AliasedProduct*) extends Clause with ElementPropertyExtractingAndAliasing {
+private[cypherDSL] class Returns(elements: Either[AliasedProduct, Operator]*)
+    extends Clause
+    with ElementPropertyExtractingAndAliasing {
   private val errorMessage = "One or more of the elements to be returned are not in Context!"
 
   @throws[NoSuchElementException]
   def toQuery(context: Context = new Context()): String = {
     val ids = elements
       .map(element => {
-        val (el, properties) = getElementAndProperties(element.node)
-        context
-          .get(el)
-          .map(identifier => makeAliasedString(identifier, properties, element.alias))
-          .getOrElse(throw new NoSuchElementException(errorMessage))
+        if (element.isRight) element.right.get.toQuery(context)
+        else {
+          val aliasedProduct   = element.left.get
+          val (el, properties) = getElementAndProperties(aliasedProduct.node)
+          context
+            .get(el)
+            .map(identifier => makeAliasedString(identifier, properties, aliasedProduct.alias))
+            .getOrElse(throw new NoSuchElementException(errorMessage))
+        }
       })
       .mkString(",")
 
@@ -108,8 +84,15 @@ private[cypherDSL] class Returns(elements: AliasedProduct*) extends Clause with 
   }
 }
 private[cypherDSL] object Returns {
-  def apply(elements: Product*): Returns = new Returns(AliasedProduct.makeAliasedProduct(elements.toList): _*)
-  val empty                              = Returns(Seq.empty: _*)
+  private def makeEitherList(products: List[Product]): List[Either[AliasedProduct, Operator]] = products match {
+    case Nil                        => List.empty
+    case (s: Operator) :: remaining => Right(s) +: makeEitherList(remaining)
+    case s :: remaining             => Left(AliasedProduct.makeAliasedProduct(s)) +: makeEitherList(remaining)
+  }
+  def apply(elements: Product*): Returns = {
+    new Returns(makeEitherList(elements.toList): _*)
+  }
+  val empty = Returns(Seq.empty: _*)
 }
 
 private case class OrderingProduct(element: Product)
@@ -153,21 +136,27 @@ private[cypherDSL] object OrdersBy {
   val empty = OrdersBy(Seq.empty: _*)
 }
 
-private[cypherDSL] class With(elements: AliasedProduct*) extends Clause with ElementPropertyExtractingAndAliasing {
+private[cypherDSL] class With(elements: Either[AliasedProduct, Operator]*)
+    extends Clause
+    with ElementPropertyExtractingAndAliasing {
   private val errorMessage = "One or more of the elements to be returned are not in Context!"
 
   @throws[NoSuchElementException]
   def toQuery(context: Context = new Context()): String = {
     val ids = elements
       .map(element => {
-        val (el, properties) = getElementAndProperties(element.node)
-        context
-          .get(el)
-          .map(identifier => {
-            if (element.alias.isDefined) context.update(element.node, element.alias.get)
-            makeAliasedString(identifier, properties, element.alias)
-          })
-          .getOrElse(throw new NoSuchElementException(errorMessage))
+        if (element.isRight) element.right.get.toQuery(context)
+        else {
+          val aliasedProduct   = element.left.get
+          val (el, properties) = getElementAndProperties(aliasedProduct.node)
+          context
+            .get(el)
+            .map(identifier => {
+              if (aliasedProduct.alias.isDefined) context.update(aliasedProduct.node, aliasedProduct.alias.get)
+              makeAliasedString(identifier, properties, aliasedProduct.alias)
+            })
+            .getOrElse(throw new NoSuchElementException(errorMessage))
+        }
       })
       .mkString(",")
 
@@ -175,6 +164,11 @@ private[cypherDSL] class With(elements: AliasedProduct*) extends Clause with Ele
   }
 }
 private[cypherDSL] object With {
-  def apply(elements: Product*): With = new With(AliasedProduct.makeAliasedProduct(elements.toList): _*)
+  private def makeEitherList(products: List[Product]): List[Either[AliasedProduct, Operator]] = products match {
+    case Nil                        => List.empty
+    case (s: Operator) :: remaining => Right(s) +: makeEitherList(remaining)
+    case s :: remaining             => Left(AliasedProduct.makeAliasedProduct(s)) +: makeEitherList(remaining)
+  }
+  def apply(elements: Product*): With = new With(makeEitherList(elements.toList): _*)
   val empty                           = With(Seq.empty: _*)
 }

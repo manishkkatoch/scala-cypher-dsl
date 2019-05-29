@@ -9,6 +9,10 @@ object syntax {
   object v1 {
     def cypher = Statement()
 
+    def DISTINCT(element: Product) = {
+      DistinctOperator(AliasedProduct.makeAliasedProduct(element))
+    }
+
     implicit class RichStatement(statement: Statement) {
       def MATCH[T <: Product](element: T)(implicit queryProvider: QueryProvider[T]): Statement = {
         statement.copy(clauses = statement.clauses :+ Matches(element))
@@ -42,7 +46,7 @@ object syntax {
         statement.copy(clauses = statement.clauses :+ Limits(count))
       }
 
-      def RETURN[T <: Product](elements: T*): Statement = {
+      def RETURN(elements: Product*): Statement = {
         statement.copy(clauses = statement.clauses :+ Returns(elements: _*))
       }
 
