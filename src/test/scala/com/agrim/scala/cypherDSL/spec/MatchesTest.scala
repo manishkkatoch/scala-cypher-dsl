@@ -4,7 +4,6 @@ import com.agrim.scala.cypherDSL.spec.utils.Random._
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses.{Department, Person, WorksIn}
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses.ImplicitCache._
 import org.scalatest.{Matchers, WordSpec}
-import com.agrim.scala.cypherDSL.syntax._
 
 class MatchesTest extends WordSpec with Matchers {
   private val person: Person         = randomize[Person]

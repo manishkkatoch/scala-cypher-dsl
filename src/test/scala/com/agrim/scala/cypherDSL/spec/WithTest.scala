@@ -3,7 +3,6 @@ package com.agrim.scala.cypherDSL.spec
 import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 import com.agrim.scala.cypherDSL.spec.utils.Random._
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses.{Department, Person}
-import com.agrim.scala.cypherDSL.syntax._
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses.ImplicitCache._
 
 class WithTest extends WordSpec with Matchers with BeforeAndAfterEach {
@@ -33,12 +32,10 @@ class WithTest extends WordSpec with Matchers with BeforeAndAfterEach {
       With(personA, departmentA).toQuery(context) shouldBe "WITH a0,a1"
     }
     "WITH elements for a property" in {
-      With(personA('name), departmentA)
-        .toQuery(context) shouldBe "WITH a0.name,a1"
+      With(personA('name), departmentA).toQuery(context) shouldBe "WITH a0.name,a1"
     }
     "WITH elements for multiple properties" in {
-      With(personA('name, 'age), departmentA('name))
-        .toQuery(context) shouldBe "WITH a0.name,a0.age,a1.name"
+      With(personA('name, 'age), departmentA('name)).toQuery(context) shouldBe "WITH a0.name,a0.age,a1.name"
     }
     "throw if element to be WITHed not in Context" in {
       the[NoSuchElementException] thrownBy {
@@ -50,8 +47,7 @@ class WithTest extends WordSpec with Matchers with BeforeAndAfterEach {
         .toQuery(context) shouldBe "WITH a0 as person,a1 as department"
     }
     "WITH non-aliased and aliased elements in a single WITH" in {
-      With(personA, departmentA -> "department")
-        .toQuery(context) shouldBe "WITH a0,a1 as department"
+      With(personA, departmentA -> "department").toQuery(context) shouldBe "WITH a0,a1 as department"
     }
     "WITH aliased elements for a property" in {
       With(personA('name) -> "personName", departmentA -> "department")

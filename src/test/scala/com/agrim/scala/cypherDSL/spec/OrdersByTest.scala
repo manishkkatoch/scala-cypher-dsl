@@ -3,7 +3,6 @@ package com.agrim.scala.cypherDSL.spec
 import org.scalatest.{Matchers, WordSpec}
 import com.agrim.scala.cypherDSL.spec.utils.Random._
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses.{Department, Person}
-import com.agrim.scala.cypherDSL.syntax._
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses.ImplicitCache._
 
 class OrdersByTest extends WordSpec with Matchers {
@@ -30,8 +29,7 @@ class OrdersByTest extends WordSpec with Matchers {
         OrdersBy(false, personA, departmentA).toQuery(context) shouldBe "ORDER BY a0,a1"
       }
       "return elements for a property" in {
-        OrdersBy(false, personA('name), departmentA)
-          .toQuery(context) shouldBe "ORDER BY a0.name,a1"
+        OrdersBy(false, personA('name), departmentA).toQuery(context) shouldBe "ORDER BY a0.name,a1"
       }
       "return elements for multiple properties" in {
         OrdersBy(false, personA('name, 'age), departmentA('name))
@@ -56,8 +54,7 @@ class OrdersByTest extends WordSpec with Matchers {
         OrdersBy(true, personA, departmentA).toQuery(context) shouldBe "ORDER BY a0,a1 DESC"
       }
       "return elements for a property" in {
-        OrdersBy(true, personA('name), departmentA)
-          .toQuery(context) shouldBe "ORDER BY a0.name,a1 DESC"
+        OrdersBy(true, personA('name), departmentA).toQuery(context) shouldBe "ORDER BY a0.name,a1 DESC"
       }
       "return elements for multiple properties" in {
         OrdersBy(true, personA('name, 'age), departmentA('name))
