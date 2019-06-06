@@ -1,9 +1,11 @@
-package com.agrim.scala.cypherDSL.spec
+package com.agrim.scala.cypherDSL.spec.clauses
 
-import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
+import com.agrim.scala.cypherDSL.spec.Context
+import com.agrim.scala.cypherDSL.spec.syntax.patterns._
 import com.agrim.scala.cypherDSL.spec.utils.Random._
-import com.agrim.scala.cypherDSL.spec.utils.TestClasses.{Department, Person}
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses.ImplicitCache._
+import com.agrim.scala.cypherDSL.spec.utils.TestClasses.{Department, Person}
+import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
 
 class WithTest extends WordSpec with Matchers with BeforeAndAfterEach {
 
