@@ -4,7 +4,7 @@ plugins {
     id "com.github.maiflai.scalatest" version "0.19"
     id "org.scoverage" version "2.5.0"
 }
-group 'org.agrim'
+group 'me.manishkatoch'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -27,5 +27,5 @@ dependencies {
     testRuntime 'org.pegdown:pegdown:1.4.2'
 }
 scoverage {
-   excludedPackages = ["com.agrim.scala.cypherDSL.spec.implicits"]
+   excludedPackages = ["me.manishkatoch.scala.cypherDSL.spec.implicits"]
 }
