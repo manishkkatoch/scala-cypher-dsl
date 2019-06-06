@@ -6,7 +6,7 @@ object TestClasses {
   case class Person(id: String, name: String, age: Int)
   case class IsFriendOf(since: Int, lastConnectedOn: String)
   case class Department(id: String, name: String)
-  case class LocatedIn()
+  case class LocatedIn(area: String)
   case class Region(name: String)
   case class HeadOfDepartment(id: String, name: String)
   case class TenPropClass(prop1: String,

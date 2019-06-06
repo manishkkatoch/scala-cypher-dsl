@@ -1,40 +1,43 @@
-package com.agrim.scala.cypherDSL.spec
+package com.agrim.scala.cypherDSL.spec.clauses
 
-import org.scalatest.{Matchers, WordSpec}
+import com.agrim.scala.cypherDSL.spec.Context
+import com.agrim.scala.cypherDSL.spec.syntax.any
+import com.agrim.scala.cypherDSL.spec.syntax.patterns._
 import com.agrim.scala.cypherDSL.spec.utils.Random._
-import com.agrim.scala.cypherDSL.spec.utils.TestClasses.{Department, Person}
-import com.agrim.scala.cypherDSL.syntax._
 import com.agrim.scala.cypherDSL.spec.utils.TestClasses.ImplicitCache._
+import com.agrim.scala.cypherDSL.spec.utils.TestClasses.{Department, Person}
+import org.scalatest.{Matchers, WordSpec}
 
 class ReturnsTest extends WordSpec with Matchers {
 
-  private val personA          = randomize[Person]
-  private val personB          = randomize[Person]
-  private val departmentA      = randomize[Department]
-  private implicit val context = new Context()
+  private val personA                   = randomize[Person]
+  private val personB                   = randomize[Person]
+  private val departmentA               = randomize[Department]
+  private val anyPerson                 = any[Person]
+  private implicit val context: Context = new Context()
 
   "Returns" should {
     context.add(personA)
     context.add(departmentA)
+    context.add(anyPerson)
 
     "return query for an element in Context" in {
       Returns(personA).toQuery(context) shouldBe "RETURN a0"
     }
-
+    "return query for any element in Context" in {
+      Returns(anyPerson).toQuery(context) shouldBe "RETURN a2"
+    }
     "return empty statement if no elements passed" in {
       Returns().toQuery(context) shouldBe ""
     }
-
     "return query for more than one element in Context" in {
       Returns(personA, departmentA).toQuery(context) shouldBe "RETURN a0,a1"
     }
     "return elements for a property" in {
-      Returns(personA('name), departmentA)
-        .toQuery(context) shouldBe "RETURN a0.name,a1"
+      Returns(personA('name), departmentA).toQuery(context) shouldBe "RETURN a0.name,a1"
     }
     "return elements for multiple properties" in {
-      Returns(personA('name, 'age), departmentA('name))
-        .toQuery(context) shouldBe "RETURN a0.name,a0.age,a1.name"
+      Returns(personA('name, 'age), departmentA('name)).toQuery(context) shouldBe "RETURN a0.name,a0.age,a1.name"
     }
     "throw if element to be returned not in Context" in {
       the[NoSuchElementException] thrownBy {
@@ -46,8 +49,7 @@ class ReturnsTest extends WordSpec with Matchers {
         .toQuery(context) shouldBe "RETURN a0 as person,a1 as department"
     }
     "return non-aliased and aliased elements in a single return" in {
-      Returns(personA, departmentA -> "department")
-        .toQuery(context) shouldBe "RETURN a0,a1 as department"
+      Returns(personA, departmentA -> "department").toQuery(context) shouldBe "RETURN a0,a1 as department"
     }
     "return aliased elements for a property" in {
       Returns(personA('name) -> "personName", departmentA -> "department")

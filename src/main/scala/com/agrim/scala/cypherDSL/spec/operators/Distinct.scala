@@ -1,10 +1,9 @@
-package com.agrim.scala.cypherDSL.spec
+package com.agrim.scala.cypherDSL.spec.operators
+import com.agrim.scala.cypherDSL.spec.Context
+import com.agrim.scala.cypherDSL.spec.entities.AliasedProduct
+import com.agrim.scala.cypherDSL.spec.utils.ElementPropertyExtractingAndAliasing
 
-sealed trait Operator {
-  def toQuery(context: Context): String
-}
-
-case class DistinctOperator(element: AliasedProduct) extends Operator with ElementPropertyExtractingAndAliasing {
+private[spec] case class Distinct(element: AliasedProduct) extends Operator with ElementPropertyExtractingAndAliasing {
   override def toQuery(context: Context): String = {
     val (el, properties) = getElementAndProperties(element.node)
     val ids = context

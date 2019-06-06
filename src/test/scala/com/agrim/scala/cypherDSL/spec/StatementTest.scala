@@ -12,10 +12,6 @@ class StatementTest extends WordSpec with Matchers {
   "A Statement" must {
     context.add(person)
 
-    "return RETURN string if passed a return clause" in {
-      Statement(Seq(Returns(person))).toQuery(context) shouldBe "RETURN a0"
-    }
-
     "return empty string if passed no clauses" in {
       Statement().toQuery(context) shouldBe ""
     }

@@ -1,6 +1,7 @@
-package com.agrim.scala.cypherDSL.spec
+package com.agrim.scala.cypherDSL.spec.utils
 
 import com.agrim.scala.cypherDSL.spec.Utils.toList
+import com.agrim.scala.cypherDSL.spec.entities.Node
 
 private[cypherDSL] trait ElementPropertyExtractingAndAliasing {
   private val tooManyPropertiesToAliasMessage = "Alias one property at a time!"

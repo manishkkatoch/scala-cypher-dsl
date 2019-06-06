@@ -9,6 +9,7 @@ private object Utils {
     def lpToList(list: HList): List[String] = list match {
       case HNil                => List.empty
       case (s: Symbol) :: tail => s.name +: lpToList(tail)
+      case s :: tail           => s.toString +: lpToList(tail)
     }
     lpToList(list)
   }
