@@ -1,16 +1,29 @@
 language: scala
-
-jdk:
-  oraclejdk8
-
-script:
-  ./gradlew check
-
+jdk: oraclejdk8
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-  - $HOME/.gradle/caches/
-  - $HOME/.gradle/wrapper/
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+env:
+  global:
+  - secure: Dh/r+wjViVc5oP6u1LQGWXcVUEYXvE+dw4fWpJ6LMwFTbIBxSWUAvcJKdIa8m2YPm5vgw/5ilCXb9P4+CbGWHwN+dFiAYjwtSQl3aewo3NWI1bgktBiFksUsYY3DhskvpmDifKSKNrVmHY6agWC4Ip8vdb/iUYPIdF+ZjLBdRdmqiBxXF0XsWJor8xv8URV43LfHpnMzVP/qKC5ISAXTuyBN+YqO8ItOKTFuKEBG4J6tgkEGGSi6Xg66ed6lkiBVA9HKCqTK6gB7S/zPSXqi/um3PY9zdd74BNIFD66yxT7glxM6lWcrznlekJmc+TsPyGMle3JQB9UNnbcO4W18CGoURdFV7YPKI1006eD6aA3gRUz0+LUFmBIH67kxXjdkwyKiA5nhj4Jy9pZlOZIyWFA6cL9RxTnjqoYRh1HIuCdLXRB0gsmOmrAQSXByBJqzxyxCC33UyHVF6b2jGfJGtYNKWAGiJ071DsGOtTKKZ/LMMfCdiILMS7+2Qa/shCfxuuzRd8XCJuByVWnXbHUBHYjFctQqYZLscbELyXK5yll59vCZtJkf6MUQpb72gpy07YN3roatkecvg8eJwVhg8Q52HCJ+SBopBUa27lbWKNgpre9A5wQraa7fz6wRB2fJh1dBAYVcGdxS80OcMFaJ1L7d6kzfV5jIhH+Of8J2Asg=
+  - secure: aspzThF1O0O3ujDCpXCVQUJ57evPdfc7FeIxILNABeiFXjtQUcsX+KZITcXALIo2+5zvMq8Njzxs9dMhT7N4gIGW4X89nMdDatmtUyuYn6HxFSvAT2C1naSwEtfEBSW7cbc6o+Omv+YP5Q0FJOdRq9pGqgPoUJ1fRwU4brHB4L4Rr4RMeO4/kwwO9ToBN9bZvX0YoNblwWSXZ0vA1sMFoZneKRzLpzScuR3cLRF5xI6Dv3PzNtJQKiwZ7b/NqbLodueZ4+l4xeu4kNsf5luGQIM9mjKaX/a6A+ZdWqddp3WCra56Vx7/A9XQIlt1dlMtUJtPkN/jAPQDOy1DxDEGhibJQr8ClAScvIdqDBSXmufn7oEDC/v39VTkvusOIQDItsWdBRSOJnr5Gh6783rrfY1gbNpSHdp8/dq68E3aNf0NrdRK301o5Jp/ocyZMmr9e54gH+8XlOPG83sCu8kg7JtkMOijR0icbNEkUM0vYsjh8aKMiyxAQggAZSYq7hzgJPXi8/z/vaBJobYfGkZDODI62kJbYWrduG7rLKiBNiDIiZvzCEu2j0zFNYxS1EmhFh/YNdtHzxmIfISdGFKFejw/D3ibKlPfc2TeM2reoHC4Di2LMe5IGH/lQMo2eATzEhUkrHE81NMAWSriWhptBjdhnIN+pAUVIX15kZMFRA0=
+  - secure: jGA+W9Aa1xC7qOtzL9FF0pUlIGnm19qCGVuYuLFDttww/d4jeTUw/fx8gXO055vD9Wgd/VVnrixGYf65IQHrSh23PYhYYwbteZskC8hD6ahIwA9GmMMqmGe/PjmeNLTxMtyPwRgDNlvB83t1z9zAuTP9uY0pcDXeuplLgwt1OV+7RIVT+fjuc3XgRAWIcN6F98QkQJpWoSN7QF5WKX2wq7M/hLspiBRa9y2j1IX+iQ9uH8j23l/G3VtRHciwTrsGX7tKp5YF5kJ31njJ8MJWYXXxCpN3hSQUQdIIYW6RE2gsBPg2XdpD0EhRgxvjm1TmcPcjZ3RlN/JNbPg8o5a34nN9mwmmlG6iosKA+1cXSpQyhpGSsHsZ8Fj2sJEwNnBM2tzu3JuHxK2/T6bLlsFootklePxxtV2HuHIGMYaMeCIdu6GtwxXNvQmEIKXp7sQeHY/z/GUPUYGvhcq2+Fo9ipztg5OVW4ddSwmyzpgqkpc90mAvfH9oJCCPa4uIiqzvEy1QPX3JMx3asOqX/fOIK3Ym6P6FDDetcy1qfGI8zV1DImw6prxYvieewyaV0DyeOh88BMdqy71BS4TuuuyVpR9mjv5vu+xdSv2O9XWXbCKjyPZpzZR+FA3vuyiE1wIE1mj1SG5mp3bnSjT105pqgvndjIBXY2trCvbuhOqINqo=
+  - secure: jQshjfWLGSsnpDV0eg35xzvM8X2Z7uDDlaKLdm4jm7WGCYHwdCjV39xzLpxCsK6Sx4xEfPsrkdcqXcstCHivlEEMbN729w87q6LjCAMbac28nviDKSt/Rr/d4COFZjA838c83gfgDVqKoYEyLb0e1zYwq+I8mr96d6+FaJ9NIjNUDjh5Aoo1XGwdmKqeJsjcE/cR6VhK3bhOpRxHfsB3e41i5dbzoeawMCIRx6fCbgAHd5chKpisXBjz6EVsF3etk6Ks0Bqvu9TO065nkV9vAn7PsjiHK0KFpqBeJBEPpbcv+w2+aa/ORxXI8BBznZgRIyNBGvmMGeM1aaD4yVDYzsKxobszJbL8CM9J0pvZK865vIXnR5A41/lE2aYih2REF7a8ocx14LLLJ+FM6C2Le7uJR4ccEC9NMIRwl+/CWAXaUCcPdYnmmY+Bc3CwQ5Ntr5i3+4rF1K+4ghzglHj9/wpNE7j5mx0AiluKYyPM5zIF4DKQMEFanv0cqtt7Wn5JQ0zlOwForDhD15+j8F8HeIuFKmuDDX/SabRZg1pRWmnqpJpvX6N5Agz4jXsfH8Ok7f+enVIu1MJMRAfgqlekXLjf/qNgIrx3GjKdBFXFWjnhKbnGa7Ycf/kDMLeqFSrquRsXIV2p07f/zNhWsYqlUZWNj2ghuWWmliuobD/Mq0M=
+  - secure: eE/O85mgl4+Q6TcmAlUY358Mx5txGKXewuqlW7iI7R26C+hn98SyFlMzXjjqFLdFgiEfLoMTwXe6Ywj6Kz2x/uty9pPiOGvxAAVqpNbDPvaDZWgUjjpRvarkudN1Y59Ue0m9IXB6ecbwPJcT4cvEF3BzPAHuhQhVvm0npZnysNfrM3QKGTfVawzmNgV4ms42dcbWyxrcoqlAXlHFpeznts1Y1v5vx21Uc61XL5RNwVSUPH+6AI71Nruh1DKS3DMFQoh5B8ixk7RPwlgCG4ZhDCkadA6z/5fH5cIIhpoDJPjnv9bD20JhQB07MHwSVMlev+IF/siJcdYnWdIvrxWVkS0MmBfDlTOX/1Vsp3jWoEYQulIBcKDsEtDhaxKjD16vh6ELA3zsvbWW8BzRp6ljipc+4QrroPFVl5PBGeS2ZK62iPqQICJRPSdFaQ+2Nwdt1rK/dutywWwJff6pMFDDrQLI1cdBEmAqN+6gY3dOo6Ak9HfL89hWPfYBs14vtUjYKB5dYnTA6IaIccHLrqHgCpikk4SAUbS8o+wUWUKR6FuNE/p348WvMqR7z6pIow0abUpjWxoPimRvv4gNafRan1pXSBLobptFyVshbyi1NiBtCQ8ciuanum90P7fig1h2CuDqxjIi8mVaxIyllnUBXmWQis5Te5+BmaSkKLvKWPw=
+  - GPG_KEY_LOCATION=".travis/secret.gpg"
+  - ENCRYPTED_GPG_KEY_LOCATION=".travis/secret.gpg.enc"
+before_install:
+  - chmod -R ug+x .travis
+  - .travis/install.sh
+branches:
+  only:
+    - master
+    - develop
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+script:
+  - chmod -R ug+x .travis
+  - .travis/run.sh

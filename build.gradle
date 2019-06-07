@@ -1,11 +1,14 @@
 plugins {
+    id 'maven'
+    id 'signing'
     id 'scala'
     id 'idea'
     id "com.github.maiflai.scalatest" version "0.19"
     id "org.scoverage" version "2.5.0"
 }
+
 group 'me.manishkatoch'
-version '1.0-SNAPSHOT'
+version buildVersion
 
 sourceCompatibility = 1.8
 
@@ -27,5 +30,78 @@ dependencies {
     testRuntime 'org.pegdown:pegdown:1.4.2'
 }
 scoverage {
-   excludedPackages = ["me.manishkatoch.scala.cypherDSL.spec.implicits"]
+    excludedPackages = ["me.manishkatoch.scala.cypherDSL.spec.implicits"]
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Sign }) {
+        allprojects { ext."signing.keyId" = System.getenv('GPG_KEY_ID') }
+        allprojects { ext."signing.secretKeyRingFile" = System.getenv('GPG_KEY_LOCATION') }
+        allprojects { ext."signing.password" = System.getenv('GPG_PASSPHRASE') }
+    }
+
+    if (taskGraph.allTasks.any { it.name == 'build' || it.name == 'assemble' }) {
+        tasks.findAll { it.name == 'signArchives' || it.name == 'signDocsJar' || it.name == 'signTestJar' }.each { task ->
+            task.enabled = false
+        }
+    }
+}
+signing {
+    sign configurations.archives
+}
+build.dependsOn.remove(signArchives)
+
+task scaladocJar(type: Jar, dependsOn: scaladoc) {
+    classifier = 'javadoc'
+    from "${project.buildDir}/docs/scaladoc"
+}
+
+task sourceJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives jar
+    archives scaladocJar
+    archives sourceJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment {
+                MavenDeployment deployment -> signing.signPom(deployment)
+                }
+            repository(url: maven2_url) {
+                authentication(userName: System.getenv('SONATYPE_USERNAME'), password: System.getenv('SONATYPE_PASSWORD'))
+            }
+            snapshotRepository(url: snapshot_url) {
+                authentication(userName: System.getenv('SONATYPE_USERNAME'), password: System.getenv('SONATYPE_PASSWORD'))
+            }
+            pom.project {
+                        name project_name
+                        packaging 'jar'
+                        description project_description
+                        url project_url
+                        scm {
+                            connection project_scm
+                            developerConnection project_scm
+                            url project_url
+                        }
+                        licenses {
+                            license {
+                                name project_license_slug
+                                url project_license_url
+                            }
+                        }
+                        developers {
+                            developer {
+                                id project_developer
+                                name project_developer_name
+                            }
+                        }
+                    }
+            }
+}
 }
