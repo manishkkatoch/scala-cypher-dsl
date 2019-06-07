@@ -26,4 +26,4 @@ branches:
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 script:
   - chmod -R ug+x .travis
-  - .travis/run.sh
+  - ./gradlew clean check
