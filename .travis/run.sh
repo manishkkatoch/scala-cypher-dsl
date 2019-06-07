@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+echo "running for branch $TRAVIS_BRANCH"
 
 if [ "$TRAVIS_BRANCH" = "master" ] || [ "$TRAVIS_BRANCH" = "develop"];
 then
