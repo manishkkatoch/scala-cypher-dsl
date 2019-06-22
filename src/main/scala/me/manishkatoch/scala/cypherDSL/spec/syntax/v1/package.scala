@@ -13,6 +13,7 @@ package object v1 {
   def any[T <: Product: WeakTypeTag]    = NodeType(weakTypeOf[T])
   def anyNode = NodeType(weakTypeOf[Any])
   def anyRel[T <: Product: WeakTypeTag] = RelationType(weakTypeOf[T])
+  def anyRelation = RelationType(weakTypeOf[Any])
 
   implicit class MatcherStatement(statement: Statement) {
     def MATCH[T <: Product](element: T)(implicit queryProvider: QueryProvider[T]): Statement = {

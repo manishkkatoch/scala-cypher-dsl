@@ -225,4 +225,19 @@ class SyntaxV1Test extends WordSpec with Matchers {
       cypher.MATCH(anyN2).toQuery(ctx) shouldBe "MATCH (a1)"
     }
   }
+  "anyRelation" should {
+    "provide right query when not in context" in {
+      cypher.MATCH(anyNode).toQuery() shouldBe "MATCH (a0)"
+    }
+    "provide right query when in context" in {
+      val ctx = new Context()
+      val anyN = anyNode
+      val anyN2 = anyNode
+      val anyR = anyRelation
+      val anyR2 = anyRelation
+      cypher.MATCH(anyN -| anyR |-> anyN2).toQuery(ctx) shouldBe "MATCH (a0)-[a1]->(a2)"
+      cypher.MATCH(anyN -| anyR |-> anyN2).toQuery(ctx) shouldBe "MATCH (a0)-[a1]->(a2)"
+      cypher.MATCH(anyN -| anyR2 |-> anyN2).toQuery(ctx) shouldBe "MATCH (a0)-[a3]->(a2)"
+    }
+  }
 }

@@ -633,12 +633,6 @@ class PatternsTest extends WordSpec with Matchers {
       }
       "when in context" should {
         val context = new Context()
-        context.add(weakTypeOf[Person])
-        context.add(weakTypeOf[Department])
-        context.add(weakTypeOf[HeadOfDepartment])
-        context.add(weakTypeOf[WorksIn])
-        context.add(weakTypeOf[LocatedIn])
-        context.add(weakTypeOf[Region])
         context.add(person)
         context.add(dept)
         context.add(deptHead)
@@ -649,211 +643,211 @@ class PatternsTest extends WordSpec with Matchers {
         "provide query strings" should {
           "A -- B" in {
             val path = anyPerson -- anyDept
-            path.toQuery(context) shouldBe "(a0)--(a1)"
+            path.toQuery(context) shouldBe "(a6:Person)--(a7:Department)"
           }
           "A -- B{}" in {
             val path = anyPerson -- dept
-            path.toQuery(context) shouldBe "(a0)--(a7)"
+            path.toQuery(context) shouldBe "(a6)--(a1)"
           }
           "A -- B{{}}" in {
             val path = anyPerson -- dept('name)
-            path.toQuery(context) shouldBe "(a0)--(a7)"
+            path.toQuery(context) shouldBe "(a6)--(a1)"
           }
           "A{} -- B" in {
             val path = person('name, 'age) -- anyDept
-            path.toQuery(context) shouldBe "(a6)--(a1)"
+            path.toQuery(context) shouldBe "(a0)--(a7)"
           }
           "A --> B" in {
             val path = anyPerson --> anyDept
-            path.toQuery(context) shouldBe "(a0)-->(a1)"
+            path.toQuery(context) shouldBe "(a6)-->(a7)"
           }
           "A --> B{{}}" in {
             val path = anyPerson --> dept
-            path.toQuery(context) shouldBe "(a0)-->(a7)"
+            path.toQuery(context) shouldBe "(a6)-->(a1)"
           }
           "A --> B{}" in {
             val path = anyPerson --> dept('name)
-            path.toQuery(context) shouldBe "(a0)-->(a7)"
+            path.toQuery(context) shouldBe "(a6)-->(a1)"
           }
           "A{} --> B" in {
             val path = person('id) --> anyDept
-            path.toQuery(context) shouldBe "(a6)-->(a1)"
+            path.toQuery(context) shouldBe "(a0)-->(a7)"
           }
           "A <-- B" in {
             val path = anyPerson <-- anyDept
-            path.toQuery(context) shouldBe "(a0)<--(a1)"
+            path.toQuery(context) shouldBe "(a6)<--(a7)"
           }
           "A <-- B{}" in {
             val path = anyPerson <-- dept
-            path.toQuery(context) shouldBe "(a0)<--(a7)"
+            path.toQuery(context) shouldBe "(a6)<--(a1)"
           }
           "A <-- B{{}}" in {
             val path = anyPerson <-- dept('name)
-            path.toQuery(context) shouldBe "(a0)<--(a7)"
+            path.toQuery(context) shouldBe "(a6)<--(a1)"
           }
           "A{} <-- B" in {
             val path = person('id) <-- anyDept
-            path.toQuery(context) shouldBe "(a6)<--(a1)"
+            path.toQuery(context) shouldBe "(a0)<--(a7)"
           }
           "A -[C]- B" in {
             val path = anyPerson -| anyDeptHead |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a2]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a8:HEAD_OF_DEPARTMENT]-(a7)"
           }
           "A -[C|D]- B" in {
             val path = anyPerson -| anyDeptHead | anyWorksIn |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a2]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a9:HEAD_OF_DEPARTMENT|:WORKS_IN]-(a7)"
           }
           "A{} -[C]- B{}" in {
             val path = person('id) -| anyDeptHead |- dept('name)
-            path.toQuery(context) shouldBe "(a6)-[a2]-(a7)"
+            path.toQuery(context) shouldBe "(a0)-[a8]-(a1)"
           }
           "A -[C {{}}]- B" in {
             val path = anyPerson -| deptHead('id) |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a8]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a2]-(a7)"
           }
           "A -[C {}]- B" in {
             val path = anyPerson -| deptHead |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a8]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a2]-(a7)"
           }
           "A -[C]-> B" in {
             val path = anyPerson -| anyDeptHead |-> anyDept
-            path.toQuery(context) shouldBe "(a0)-[a2]->(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a8]->(a7)"
           }
           "A{} -[C]-> B{}" in {
             val path = person('id) -| anyDeptHead |-> dept('name)
-            path.toQuery(context) shouldBe "(a6)-[a2]->(a7)"
+            path.toQuery(context) shouldBe "(a0)-[a8]->(a1)"
           }
           "A{{}} -[C]-> B{}" in {
             val path = person -| anyDeptHead |-> dept('name)
-            path.toQuery(context) shouldBe "(a6)-[a2]->(a7)"
+            path.toQuery(context) shouldBe "(a0)-[a8]->(a1)"
           }
           "A -[C {}]-> B" in {
             val path = anyPerson -| deptHead('id) |-> anyDept
-            path.toQuery(context) shouldBe "(a0)-[a8]->(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a2]->(a7)"
           }
           "A <-[C]- B" in {
             val path = anyPerson <-| anyDeptHead |- anyDept
-            path.toQuery(context) shouldBe "(a0)<-[a2]-(a1)"
+            path.toQuery(context) shouldBe "(a6)<-[a8]-(a7)"
           }
           "A{{}} <-[C]- B{}" in {
             val path = person('id) <-| anyDeptHead |- dept
-            path.toQuery(context) shouldBe "(a6)<-[a2]-(a7)"
+            path.toQuery(context) shouldBe "(a0)<-[a8]-(a1)"
           }
           "A{} <-[C]- B{{}}" in {
             val path = person <-| anyDeptHead |- dept('name)
-            path.toQuery(context) shouldBe "(a6)<-[a2]-(a7)"
+            path.toQuery(context) shouldBe "(a0)<-[a8]-(a1)"
           }
           "A <-[C {}]- B" in {
             val path = anyPerson <-| deptHead('id) |- anyDept
-            path.toQuery(context) shouldBe "(a0)<-[a8]-(a1)"
+            path.toQuery(context) shouldBe "(a6)<-[a2]-(a7)"
           }
           "(anyA)-[R]-(anyB)-[R2]-(anyA2)" in {
             val path = anyPerson -| worksIn |- anyDept -| locatedIn |- anyRegion
-            path.toQuery(context) shouldBe "(a0)-[a9]-(a1)-[a10]-(a5)"
+            path.toQuery(context) shouldBe "(a6)-[a3]-(a7)-[a4]-(a10:Region)"
           }
           "(A)-[anyR]-(B)-[anyR2]-(A2)" in {
             val path = person -| anyWorksIn |- dept -| anyLocatedIn |- region
-            path.toQuery(context) shouldBe "(a6)-[a3]-(a7)-[a4]-(a11)"
+            path.toQuery(context) shouldBe "(a0)-[a11:WORKS_IN]-(a1)-[a12:LOCATED_IN]-(a5)"
           }
           "(anyA)-[R]->(anyB)-[R2]->(anyA2)" in {
             val path = anyPerson -| worksIn |-> anyDept -| locatedIn |-> anyRegion
-            path.toQuery(context) shouldBe "(a0)-[a9]->(a1)-[a10]->(a5)"
+            path.toQuery(context) shouldBe "(a6)-[a3]->(a7)-[a4]->(a10)"
           }
           "(A)-[anyR]->(B)-[anyR2]->(A2)" in {
             val path = person -| anyWorksIn |-> dept -| anyLocatedIn |-> region
-            path.toQuery(context) shouldBe "(a6)-[a3]->(a7)-[a4]->(a11)"
+            path.toQuery(context) shouldBe "(a0)-[a11]->(a1)-[a12]->(a5)"
           }
           "(anyA)<-[R]-(anyB)<-[R2]-(anyA2)" in {
             val path = anyPerson <-| worksIn |- anyDept <-| locatedIn |- anyRegion
-            path.toQuery(context) shouldBe "(a0)<-[a9]-(a1)<-[a10]-(a5)"
+            path.toQuery(context) shouldBe "(a6)<-[a3]-(a7)<-[a4]-(a10)"
           }
           "(A)<-[anyR]-(B)<-[anyR2]-(A2)" in {
             val path = person <-| anyWorksIn |- dept <-| anyLocatedIn |- region
-            path.toQuery(context) shouldBe "(a6)<-[a3]-(a7)<-[a4]-(a11)"
+            path.toQuery(context) shouldBe "(a0)<-[a11]-(a1)<-[a12]-(a5)"
           }
           "(anyA)<-[R]-(anyB)-[R2]->(anyA2)" in {
             val path = anyPerson <-| worksIn |- anyDept -| locatedIn |-> anyRegion
-            path.toQuery(context) shouldBe "(a0)<-[a9]-(a1)-[a10]->(a5)"
+            path.toQuery(context) shouldBe "(a6)<-[a3]-(a7)-[a4]->(a10)"
           }
           "(A)<-[anyR]-(B)-[anyR2]->(A2)" in {
             val path = person <-| anyWorksIn |- dept -| anyLocatedIn |-> region
-            path.toQuery(context) shouldBe "(a6)<-[a3]-(a7)-[a4]->(a11)"
+            path.toQuery(context) shouldBe "(a0)<-[a11]-(a1)-[a12]->(a5)"
           }
           "(anyA)-[R]->(anyB)<-[R2]-(anyA2)" in {
             val path = anyPerson -| worksIn |-> anyDept <-| locatedIn |- anyRegion
-            path.toQuery(context) shouldBe "(a0)-[a9]->(a1)<-[a10]-(a5)"
+            path.toQuery(context) shouldBe "(a6)-[a3]->(a7)<-[a4]-(a10)"
           }
           "(A)-[anyR]->(B)<-[anyR2]-(A2)" in {
             val path = person -| anyWorksIn |-> dept <-| anyLocatedIn |- region
-            path.toQuery(context) shouldBe "(a6)-[a3]->(a7)<-[a4]-(a11)"
+            path.toQuery(context) shouldBe "(a0)-[a11]->(a1)<-[a12]-(a5)"
           }
           "(anyA)<-[R]-(anyB)<-[R2]-(anyA2)-->(anyA)" in {
             val path = anyPerson <-| worksIn |- anyDept <-| locatedIn |- anyRegion --> anyPerson
-            path.toQuery(context) shouldBe "(a0)<-[a9]-(a1)<-[a10]-(a5)-->(a0)"
+            path.toQuery(context) shouldBe "(a6)<-[a3]-(a7)<-[a4]-(a10)-->(a6)"
           }
           "(A)<-[anyR]-(B)<-[anyR2]-(A2)-->(A)" in {
             val path = person <-| anyWorksIn |- dept <-| anyLocatedIn |- region --> person
-            path.toQuery(context) shouldBe "(a6)<-[a3]-(a7)<-[a4]-(a11)-->(a6)"
+            path.toQuery(context) shouldBe "(a0)<-[a11]-(a1)<-[a12]-(a5)-->(a0)"
           }
           "A -[*1..3]- B" in {
             val path = anyPerson -|* (1 to 3) |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[*1..3]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[*1..3]-(a7)"
           }
           "A -[*1]- B" in {
             val path = anyPerson -|* 1 |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[*1]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[*1]-(a7)"
           }
           "A -[*]- B" in {
             val path = anyPerson -|* () |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[*]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[*]-(a7)"
           }
           "A -[C*1..3]- B" in {
             val path = anyPerson -|* (anyDeptHead, 1 to 3) |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a2*1..3]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a13:HEAD_OF_DEPARTMENT*1..3]-(a7)"
           }
           "A -[C{}*1..3]- B" in {
             val path = anyPerson -|* (deptHead, 1 to 3) |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a8*1..3]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a2*1..3]-(a7)"
           }
           "A -[C{{}}*1..3]- B" in {
             val path = anyPerson -|* (deptHead('id), 1 to 3) |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a8*1..3]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a2*1..3]-(a7)"
           }
           "A{} -[C*1..3]- B{}" in {
             val path = person -|* (anyDeptHead, 1 to 3) |- dept
-            path.toQuery(context) shouldBe "(a6)-[a2*1..3]-(a7)"
+            path.toQuery(context) shouldBe "(a0)-[a14:HEAD_OF_DEPARTMENT*1..3]-(a1)"
           }
           "A -[C*1]- B" in {
             val path = anyPerson -|* (anyDeptHead, 1) |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a2*1]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a15:HEAD_OF_DEPARTMENT*1]-(a7)"
           }
           "A -[C{}*1]- B" in {
             val path = anyPerson -|* (deptHead, 1) |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a8*1]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a2*1]-(a7)"
           }
           "A -[C{{}}*1]- B" in {
             val path = anyPerson -|* (deptHead('id), 1) |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a8*1]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a2*1]-(a7)"
           }
           "A{} -[C*1]- B{}" in {
             val path = person -|* (anyDeptHead, 1) |- dept
-            path.toQuery(context) shouldBe "(a6)-[a2*1]-(a7)"
+            path.toQuery(context) shouldBe "(a0)-[a16:HEAD_OF_DEPARTMENT*1]-(a1)"
           }
           "A -[C*]- B" in {
             val path = anyPerson -|* anyDeptHead |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a2*]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a17:HEAD_OF_DEPARTMENT*]-(a7)"
           }
           "A -[C{}*]- B" in {
             val path = anyPerson -|* deptHead |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a8*]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a2*]-(a7)"
           }
           "A -[C{{}}*]- B" in {
             val path = anyPerson -|* deptHead('name) |- anyDept
-            path.toQuery(context) shouldBe "(a0)-[a8*]-(a1)"
+            path.toQuery(context) shouldBe "(a6)-[a2*]-(a7)"
           }
           "A{} -[C*]- B{}" in {
             val path = person -|* anyDeptHead |- dept
-            path.toQuery(context) shouldBe "(a6)-[a2*]-(a7)"
+            path.toQuery(context) shouldBe "(a0)-[a18:HEAD_OF_DEPARTMENT*]-(a1)"
           }
         }
       }
