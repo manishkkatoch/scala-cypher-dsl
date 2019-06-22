@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec.syntax
+
 import me.manishkatoch.scala.cypherDSL.spec.Context
 import me.manishkatoch.scala.cypherDSL.spec.syntax.patterns._
 import me.manishkatoch.scala.cypherDSL.spec.utils.Random.randomize

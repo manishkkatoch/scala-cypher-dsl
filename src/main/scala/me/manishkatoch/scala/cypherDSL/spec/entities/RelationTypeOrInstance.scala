@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec.entities
+
 import me.manishkatoch.scala.cypherDSL.spec.Context
 import me.manishkatoch.scala.cypherDSL.spec.utils._
 import shapeless.HList

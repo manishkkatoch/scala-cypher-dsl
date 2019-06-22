@@ -1,8 +1,9 @@
 package me.manishkatoch.scala.cypherDSL.spec
+
 import me.manishkatoch.scala.cypherDSL.spec.clauses.Clause
 
 private[cypherDSL] case class Statement(clauses: Seq[Clause]) {
-  def toQuery(context: Context): String = {
+  def toQuery(context: Context = new Context()): String = {
     clauses.map(clause => clause.toQuery(context)).mkString(System.lineSeparator())
   }
 }

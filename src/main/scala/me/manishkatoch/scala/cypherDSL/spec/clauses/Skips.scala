@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
+
 import me.manishkatoch.scala.cypherDSL.spec.Context
 
 private[spec] class Skips(count: Int) extends Clause {

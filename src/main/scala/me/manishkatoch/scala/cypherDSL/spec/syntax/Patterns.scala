@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec.syntax
+
 import me.manishkatoch.scala.cypherDSL.spec.entities._
 import me.manishkatoch.scala.cypherDSL.spec.{Path, PathLink, QueryProvider}
 import shapeless.ops.hlist.ToTraversable

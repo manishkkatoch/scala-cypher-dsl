@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
+
 import me.manishkatoch.scala.cypherDSL.spec.entities.{Node, NodeType}
 import me.manishkatoch.scala.cypherDSL.spec.{Context, Path, PathLink, QueryProvider}
 import shapeless.{::, HList, HNil}

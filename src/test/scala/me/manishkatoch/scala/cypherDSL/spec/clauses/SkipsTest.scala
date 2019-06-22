@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
+
 import org.scalatest.{Matchers, WordSpec}
 
 class SkipsTest extends WordSpec with Matchers {

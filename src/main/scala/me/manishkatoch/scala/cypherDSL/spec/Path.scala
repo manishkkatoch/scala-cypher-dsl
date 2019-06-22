@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec
+
 import me.manishkatoch.scala.cypherDSL.spec.entities._
 import me.manishkatoch.scala.cypherDSL.spec.utils.SnakeCasing
 import shapeless.ops.hlist.ToTraversable

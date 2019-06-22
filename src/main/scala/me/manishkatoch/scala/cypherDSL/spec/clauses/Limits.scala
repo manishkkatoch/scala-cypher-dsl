@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
+
 import me.manishkatoch.scala.cypherDSL.spec.Context
 
 private[cypherDSL] class Limits(count: Int) extends Clause {

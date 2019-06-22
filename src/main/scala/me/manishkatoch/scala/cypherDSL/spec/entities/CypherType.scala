@@ -1,31 +1,38 @@
 package me.manishkatoch.scala.cypherDSL.spec.entities
 
+import java.util.UUID
+
 import me.manishkatoch.scala.cypherDSL.spec.{Context, QueryProvider}
 import me.manishkatoch.scala.cypherDSL.spec.utils.SnakeCasing
 import shapeless.HList
 import shapeless.ops.hlist.ToTraversable
 
-import scala.reflect.runtime.universe.Type
+import scala.reflect.runtime.universe.{Type, typeOf}
 
-private[spec] sealed abstract class CypherType(tpe: Type) extends CypherEntity {
+private[spec] sealed abstract class CypherType(tpe: Type, fingerprint: UUID) extends CypherEntity {
   def toQuery(context: Context = new Context()): String = {
-    context.map(tpe) { _.trim }.getOrElse {
-      val id = context.add(tpe)
-      s"$id:$label"
+    context.map(fingerprint) { _.trim }.getOrElse {
+      val id = context.add(fingerprint)
+      val labelString = tpe match {
+        case s if s =:= typeOf[Any] => ""
+        case _ => s":$label"
+      }
+      s"$id$labelString"
     }
   }
 
   def label: String = tpe.typeSymbol.asClass.name.decodedName.toString
 }
 
-private[cypherDSL] case class NodeType(tpe: Type) extends CypherType(tpe) {
+
+private[cypherDSL] case class NodeType(tpe: Type) extends CypherType(tpe,UUID.randomUUID()) {
   override def toQuery(context: Context): String = s"(${super.toQuery(context)})"
 }
 
 private[cypherDSL] case class RelationType(tpe: Type,
                                            variableLengthRelation: Option[VariableLengthRelation] = None,
                                            orRelations: List[RelationTypeOrInstance] = List.empty)
-    extends CypherType(tpe)
+    extends CypherType(tpe,UUID.randomUUID())
     with SnakeCasing {
   override def toQuery(context: Context): String = {
     val orRelationStringIfAny =

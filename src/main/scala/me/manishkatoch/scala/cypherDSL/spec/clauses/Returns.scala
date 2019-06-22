@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
+
 import me.manishkatoch.scala.cypherDSL.spec.Context
 import me.manishkatoch.scala.cypherDSL.spec.entities.AliasedProduct
 import me.manishkatoch.scala.cypherDSL.spec.operators.Operator

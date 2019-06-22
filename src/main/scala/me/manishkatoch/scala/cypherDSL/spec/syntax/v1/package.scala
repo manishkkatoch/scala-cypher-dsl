@@ -11,6 +11,7 @@ import scala.reflect.runtime.universe.{weakTypeOf, WeakTypeTag}
 package object v1 {
   def cypher                            = Statement()
   def any[T <: Product: WeakTypeTag]    = NodeType(weakTypeOf[T])
+  def anyNode = NodeType(weakTypeOf[Any])
   def anyRel[T <: Product: WeakTypeTag] = RelationType(weakTypeOf[T])
 
   implicit class MatcherStatement(statement: Statement) {

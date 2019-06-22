@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
+
 import me.manishkatoch.scala.cypherDSL.spec._
 import me.manishkatoch.scala.cypherDSL.spec.entities.{Node, NodeType}
 import shapeless.ops.hlist.ToTraversable

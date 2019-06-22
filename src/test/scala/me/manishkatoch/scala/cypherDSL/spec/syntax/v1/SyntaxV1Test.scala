@@ -12,6 +12,7 @@ class SyntaxV1Test extends WordSpec with Matchers {
   val anyPerson        = any[Person]
   val worksIn: WorksIn = randomize[WorksIn]
   val dept: Department = randomize[Department]
+
   "MATCH" should {
     "provide query for an instance" in {
       cypher
@@ -209,6 +210,19 @@ class SyntaxV1Test extends WordSpec with Matchers {
       cypher
         .ORDER_BY_DESC(person('name, 'age), dept('name))
         .toQuery(context) shouldBe "ORDER BY a0.name,a0.age,a1.name DESC"
+    }
+  }
+  "anyNode" should {
+    "provide right query when not in context" in {
+      cypher.MATCH(anyNode).toQuery() shouldBe "MATCH (a0)"
+    }
+    "provide right query when in context" in {
+      val ctx = new Context()
+      val anyN = anyNode
+      val anyN2 = anyNode
+      cypher.MATCH(anyN).toQuery(ctx) shouldBe "MATCH (a0)"
+      cypher.MATCH(anyN).toQuery(ctx) shouldBe "MATCH (a0)"
+      cypher.MATCH(anyN2).toQuery(ctx) shouldBe "MATCH (a1)"
     }
   }
 }

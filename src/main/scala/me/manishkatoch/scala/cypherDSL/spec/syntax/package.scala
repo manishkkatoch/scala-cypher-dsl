@@ -1,4 +1,5 @@
 package me.manishkatoch.scala.cypherDSL.spec
+
 import me.manishkatoch.scala.cypherDSL.spec.entities.{NodeType, RelationType}
 
 import scala.reflect.runtime.universe.{weakTypeOf, WeakTypeTag}
