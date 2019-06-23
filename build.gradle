@@ -26,6 +26,8 @@ repositories {
     mavenCentral()
 }
 
+def isRunningOnTravis = System.getenv("CI") == "true"
+
 dependencies {
     implementation group: 'org.scala-lang', name: 'scala-library', version: scalaVersion
     implementation group: 'org.scala-lang', name: 'scala-compiler', version: scalaVersion
@@ -43,7 +45,13 @@ scoverage {
 gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.allTasks.any { it instanceof Sign }) {
         allprojects { ext."signing.keyId" = System.getenv('GPG_KEY_ID') }
-        allprojects { ext."signing.secretKeyRingFile" = "./secure.gpg" }
+        allprojects {
+            if (isRunningOnTravis) {
+                ext."signing.secretKeyRingFile" = file("../secure.gpg")
+            } else {
+                ext."signing.secretKeyRingFile" = "./secure.gpg"
+            }
+        }
         allprojects { ext."signing.password" = System.getenv('GPG_PASSPHRASE') }
     }
     if (taskGraph.allTasks.any { it.name == 'build' || it.name == 'assemble' }) {
