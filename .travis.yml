@@ -15,6 +15,5 @@ cache:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
 
-after_success:
-  - [[ -z $TRAVIS_TAG ]] || export BUILD_VERSION=$TRAVIS_TAG && ./gradlew uploadArchives
+after_success: [[ -z $TRAVIS_TAG ]] || export BUILD_VERSION=$TRAVIS_TAG && ./gradlew uploadArchives
   
