@@ -47,7 +47,7 @@ gradle.taskGraph.whenReady { taskGraph ->
         allprojects { ext."signing.keyId" = System.getenv('GPG_KEY_ID') }
         allprojects {
             if (isRunningOnTravis) {
-                ext."signing.secretKeyRingFile" = file("../secure.gpg")
+                ext."signing.secretKeyRingFile" = file("./secure.gpg")
             } else {
                 ext."signing.secretKeyRingFile" = "./secure.gpg"
             }
