@@ -1,6 +1,6 @@
 language: scala
 jdk: oraclejdk8
-script: ./gradlew check && $([[ -z $TRAVIS_TAG ]] || $(export BUILD_VERSION=$TRAVIS_TAG && ./gradlew uploadArchives))
+script: ./scripts/travis.sh
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/

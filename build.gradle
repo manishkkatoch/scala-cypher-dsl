@@ -52,10 +52,12 @@ gradle.taskGraph.whenReady { taskGraph ->
                 ext."signing.secretKeyRingFile" = "./secure.gpg"
             }
         }
+
         allprojects { 
         ext."signing.password" = System.getenv('GPG_PASSPHRASE')
         printf("%s", ext."signing.password")
         printf("%s", ext."signing.keyId")
+
         }
     }
     if (taskGraph.allTasks.any { it.name == 'build' || it.name == 'assemble' }) {
