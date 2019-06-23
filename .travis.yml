@@ -16,7 +16,5 @@ cache:
   - $HOME/.gradle/wrapper/
 
 after_success:
-  if: tag IS present
-  script:
-    export BUILD_VERSION=$TRAVIS_TAG && ./gradlew uploadArchives
+  - [[ -z $TRAVIS_TAG ]] || export BUILD_VERSION=$TRAVIS_TAG && ./gradlew uploadArchives
   
