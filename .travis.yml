@@ -4,7 +4,9 @@ jdk:
   oraclejdk8
 
 script:
-  ./gradlew check && `[[ -z $TRAVIS_TAG ]] || export BUILD_VERSION=$TRAVIS_TAG && ./gradlew uploadArchives`
+  ./gradlew check
+
+after_script: [[ -z $TRAVIS_TAG ]] || $(export BUILD_VERSION=$TRAVIS_TAG && ./gradlew uploadArchives)
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
