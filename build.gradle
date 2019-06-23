@@ -8,13 +8,20 @@ plugins {
 }
 
 group 'me.manishkatoch'
-version buildVersion
 
 sourceCompatibility = 1.8
 
 ext {
     scalaVersion = '2.11.9'
+    mavenUrl = project.properties.getOrDefault('maven2_url', System.getenv("MVN_URL"))
+    snapshot_url = project.properties.getOrDefault('snapshot_url', System.getenv("MVN_SNAPSHOT_URL"))
+    mavenRepositoryUsername = project.properties.getOrDefault('mavenRepositoryUsername', System.getenv("MVN_USERNAME"))
+    mavenRepositoryPassword = project.properties.getOrDefault('mavenRepositoryPassword', System.getenv("MVN_PASSWORD"))
+    build_version = project.properties.getOrDefault('buildVersion', System.getenv("BUILD_VERSION"))
 }
+
+version build_version
+
 repositories {
     mavenCentral()
 }
@@ -34,8 +41,15 @@ scoverage {
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Sign }) {
+        allprojects { ext."signing.keyId" = System.getenv('GPG_KEY_ID') }
+        allprojects { ext."signing.secretKeyRingFile" = "./secure.gpg" }
+        allprojects { ext."signing.password" = System.getenv('GPG_PASSPHRASE') }
+    }
     if (taskGraph.allTasks.any { it.name == 'build' || it.name == 'assemble' }) {
-        tasks.findAll { it.name == 'signArchives' || it.name == 'signDocsJar' || it.name == 'signTestJar' }.each { task ->
+        tasks.findAll {
+            it.name == 'signArchives' || it.name == 'signDocsJar' || it.name == 'signTestJar'
+        }.each { task ->
             task.enabled = false
         }
     }
@@ -66,36 +80,36 @@ uploadArchives {
         mavenDeployer {
             beforeDeployment {
                 MavenDeployment deployment -> signing.signPom(deployment)
-                }
-            repository(url: maven2_url) {
+            }
+            repository(url: mavenUrl) {
                 authentication(userName: mavenRepositoryUsername, password: mavenRepositoryPassword)
             }
             snapshotRepository(url: snapshot_url) {
                 authentication(userName: mavenRepositoryUsername, password: mavenRepositoryPassword)
             }
             pom.project {
-                        name project_name
-                        packaging 'jar'
-                        description project_description
-                        url project_url
-                        scm {
-                            connection project_scm
-                            developerConnection project_scm
-                            url project_url
-                        }
-                        licenses {
-                            license {
-                                name project_license_slug
-                                url project_license_url
-                            }
-                        }
-                        developers {
-                            developer {
-                                id project_developer
-                                name project_developer_name
-                            }
-                        }
+                name 'Scala Cypher DSL'
+                packaging 'jar'
+                description 'A type safe DSL for writing Cypher Query Language in Scala.'
+                url 'https://github.com/manishkkatoch/scala-cypher-dsl'
+                scm {
+                    connection 'scm:git:https://github.com/manishkkatoch/scala-cypher-dsl.git'
+                    developerConnection 'scm:git:https://github.com/manishkkatoch/scala-cypher-dsl.git'
+                    url 'https://github.com/manishkkatoch/scala-cypher-dsl'
+                }
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'https://github.com/manishkkatoch/scala-cypher-dsl/blob/master/LICENSE'
                     }
+                }
+                developers {
+                    developer {
+                        id 'manishkatoch'
+                        name 'Manish Katoch'
+                    }
+                }
             }
-}
+        }
+    }
 }

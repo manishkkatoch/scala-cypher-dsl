@@ -14,3 +14,7 @@ cache:
   directories:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
+
+after_success:
+  - ./gradlew uploadArchives
+  if: tag IS present
