@@ -16,5 +16,7 @@ cache:
   - $HOME/.gradle/wrapper/
 
 after_success:
-  - ./gradlew uploadArchives
   if: tag IS present
+  script:
+    ./gradlew uploadArchives
+  
