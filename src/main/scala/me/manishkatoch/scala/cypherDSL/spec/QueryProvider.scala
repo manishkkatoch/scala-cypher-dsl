@@ -4,13 +4,13 @@ import shapeless.ops.hlist.ToTraversable
 import shapeless.ops.record.Keys
 import shapeless.{HList, LabelledGeneric}
 
-private[cypherDSL] trait QueryProvider[T <: Product] {
+trait QueryProvider[T <: Product] {
   def getMatchers(element: T)(implicit context: Context): Seq[String]
   def getMatchers[U <: HList](element: T, columns: U)(implicit context: Context,
                                                       i0: ToTraversable.Aux[U, List, Symbol]): Seq[String]
 }
 
-private[cypherDSL] object QueryProvider {
+object QueryProvider {
   def apply[T <: Product](implicit queryProvider: QueryProvider[T]): QueryProvider[T] =
     queryProvider
 
