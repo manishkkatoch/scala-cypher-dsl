@@ -18,5 +18,5 @@ cache:
 after_success:
   if: tag IS present
   script:
-    BUILD_VERSION=$TRAVIS_TAG ./gradlew uploadArchives
+    export BUILD_VERSION=$TRAVIS_TAG && ./gradlew uploadArchives
   
