@@ -1,15 +1,21 @@
 package me.manishkatoch.scala.cypherDSL.spec.entities
 
-import me.manishkatoch.scala.cypherDSL.spec.Context
+import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
 import me.manishkatoch.scala.cypherDSL.spec.utils._
 import shapeless.HList
+
 import scala.reflect.runtime.universe._
 
-sealed trait QueryableTypeOrInstance
+sealed trait QueryableTypeOrInstance extends CypherEntity
 
 class RelationTypeOrInstance(either: Either[RelationType, Relationship[_, _]]) extends QueryableTypeOrInstance {
-  def toQuery(context: Context = new Context()): String = {
-    either.fold(_.label, _.toQuery(context).stripSemanticSugar)
+  def toQuery(context: Context = new Context()): DSLResult = {
+    either.fold(relationType => {
+      DSLResult(relationType.label)
+    }, relationship => {
+      val result = relationship.toQuery(context)
+      result.copy(query = result.query.stripSemanticSugar)
+    })
   }
 }
 object RelationTypeOrInstance {

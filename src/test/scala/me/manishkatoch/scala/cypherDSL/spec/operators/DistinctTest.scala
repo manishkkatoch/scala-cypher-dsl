@@ -1,6 +1,6 @@
 package me.manishkatoch.scala.cypherDSL.spec.operators
 
-import me.manishkatoch.scala.cypherDSL.spec.Context
+import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
 import me.manishkatoch.scala.cypherDSL.spec.entities.AliasedProduct
 import me.manishkatoch.scala.cypherDSL.spec.syntax.patterns._
 import me.manishkatoch.scala.cypherDSL.spec.utils.Random.randomize
@@ -14,17 +14,17 @@ class DistinctTest extends WordSpec with Matchers with BeforeAndAfterEach {
 
   "DISTINCT" should {
     "provide query for an aliased case class if no alias provided in context" in {
-      Distinct(AliasedProduct(person, None)).toQuery(context) shouldBe "DISTINCT a0"
+      Distinct(AliasedProduct(person, None)).toQuery(context) shouldBe DSLResult("DISTINCT a0")
     }
     "provide query for an aliased case class if alias provided in context" in {
-      Distinct(AliasedProduct(person, Option("worker"))).toQuery(context) shouldBe "DISTINCT a0 as worker"
+      Distinct(AliasedProduct(person, Option("worker"))).toQuery(context) shouldBe DSLResult("DISTINCT a0 as worker")
     }
     "provide query for an aliased node if no alias provided in context" in {
-      Distinct(AliasedProduct(person('name), None)).toQuery(context) shouldBe "DISTINCT a0.name"
+      Distinct(AliasedProduct(person('name), None)).toQuery(context) shouldBe DSLResult("DISTINCT a0.name")
     }
     "provide query for an aliased node if alias provided in context" in {
       Distinct(AliasedProduct(person('name), Option("workerName")))
-        .toQuery(context) shouldBe "DISTINCT a0.name as workerName"
+        .toQuery(context) shouldBe DSLResult("DISTINCT a0.name as workerName")
     }
   }
 

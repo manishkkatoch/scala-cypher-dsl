@@ -1,12 +1,15 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
 
 import me.manishkatoch.scala.cypherDSL.spec.entities.{Node, NodeType}
-import me.manishkatoch.scala.cypherDSL.spec.{Context, Path, PathLink, QueryProvider}
+import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult, Path, PathLink, QueryProvider}
 import shapeless.{::, HList, HNil}
 import shapeless.ops.hlist.ToTraversable
 
 private[cypherDSL] class OptionallyMatches(path: Path) extends Clause {
-  override def toQuery(context: Context = new Context()): String = s"OPTIONAL MATCH ${path.toQuery(context)}"
+  override def toQuery(context: Context = new Context()): DSLResult = {
+    val result = path.toQuery(context)
+    result.copy(query = s"OPTIONAL MATCH ${result.query}")
+  }
 }
 private[cypherDSL] object OptionallyMatches {
   def apply[T <: Product, TH <: HList](element: Node[T, TH])(

@@ -15,10 +15,15 @@ class QueryProviderTest extends WordSpec with Matchers {
 
     "For mandatory product" should {
       "create an instance for a given Product" in {
-        queryProvider.getMatchers(person) shouldBe List("id: {a0_id}", "name: {a0_name}", "age: {a0_age}")
+        queryProvider.getMatchers(person) shouldBe List(
+          DSLResult("id: {a0_id}",Map("a0_id" -> person.id)),
+          DSLResult("name: {a0_name}",Map("a0_name" -> person.name)),
+          DSLResult("age: {a0_age}",Map("a0_age" -> person.age)))
       }
       "create an instance for a given Product for a selected attribute" in {
-        queryProvider.getMatchers(person, 'id :: 'name :: HNil) shouldBe List("id: {a0_id}", "name: {a0_name}")
+        queryProvider.getMatchers(person, 'id :: 'name :: HNil) shouldBe List(
+          DSLResult("id: {a0_id}",Map("a0_id" -> person.id)),
+          DSLResult("name: {a0_name}",Map("a0_name" -> person.name)))
       }
     }
   }

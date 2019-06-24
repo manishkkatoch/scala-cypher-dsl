@@ -1,7 +1,7 @@
 package me.manishkatoch.scala.cypherDSL.spec.entities
 
 import me.manishkatoch.scala.cypherDSL.spec.utils.SnakeCasing
-import me.manishkatoch.scala.cypherDSL.spec.{Context, QueryProvider}
+import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult, QueryProvider}
 import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 
@@ -11,7 +11,7 @@ private[spec] sealed abstract class CypherInstance[T <: Product: QueryProvider, 
 
   private val queryProvider = implicitly[QueryProvider[T]]
 
-  def toQuery(context: Context = new Context()): String = {
+  def toQuery(context: Context = new Context()): DSLResult = {
     context.map(element)(getIdentifierOnlyQuery).getOrElse {
       val id = context.add(element)
       getQueryBasedOnProperties(id, context)
@@ -27,22 +27,27 @@ private[spec] sealed abstract class CypherInstance[T <: Product: QueryProvider, 
     makeExpandedQuery(id, matchers)
   }
 
-  private def makeExpandedQuery(id: String, parts: Seq[String]) = {
-    val repr = s"$id:$label {${parts.mkString(",")}}"
-    makeQuery(repr)
+  private def makeExpandedQuery(id: String, parts: Seq[DSLResult]) = {
+    val (query, paramMap) = parts.foldLeft((List.empty[String], Map.empty[String, Any])) { (acc, part) =>
+      (acc._1 :+ part.query, acc._2 ++ part.queryMap)
+    }
+    val repr = s"$id:$label {${query.mkString(",")}}"
+    DSLResult(repr, paramMap)
   }
 
   def label: String = element.getClass.getSimpleName
 
-  private def getIdentifierOnlyQuery(id: String): String = makeQuery(id)
+  private def getIdentifierOnlyQuery(id: String): DSLResult = DSLResult(id)
 
-  private def makeQuery(repr: String) = s"$repr"
 }
 
 private[cypherDSL] case class Node[T <: Product: QueryProvider, H <: HList](element: T, properties: H)(
     implicit i0: ToTraversable.Aux[H, List, Symbol])
     extends CypherInstance(element, properties) {
-  override def toQuery(context: Context = new Context()): String = s"(${super.toQuery(context)})"
+  override def toQuery(context: Context = new Context()): DSLResult = {
+    val result = super.toQuery(context)
+    result.copy(query = s"(${result.query})")
+  }
 }
 
 private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HList](
@@ -54,11 +59,22 @@ private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HLi
     extends CypherInstance(element, properties)
     with SnakeCasing {
 
-  override def toQuery(context: Context = new Context()): String = {
-    val orRelationStringIfAny =
-      if (context.get(element).isDefined) "" else orRelations.map(_.toQuery(context)).map(str => s"|:$str").mkString
+  override def toQuery(context: Context = new Context()): DSLResult = {
+    val (orRelationString, orRelationMap) = if (context.get(element).isDefined) {
+      ("", Map.empty)
+    } else {
+      val orRelationsResults    = orRelations.map(_.toQuery(context))
+      val orRelationStringIfAny = orRelationsResults.map(result => s"|:${result.query}").mkString
+      val orRelationMapIfAny = orRelationsResults.foldLeft(Map.empty[String, Any]) { (acc, result) =>
+        acc ++ result.queryMap
+      }
+      (orRelationStringIfAny, orRelationMapIfAny)
+    }
+
     val varLengthStringIfAny = variableLengthRelation.map(_.toQuery(context)).mkString
-    s"[${super.toQuery(context)}$orRelationStringIfAny$varLengthStringIfAny]"
+    val result               = super.toQuery(context)
+    result.copy(query = s"[${result.query}$orRelationString$varLengthStringIfAny]",
+                queryMap = result.queryMap ++ orRelationMap)
   }
 
   def or[U <: Product, UH <: HList](rel: U, properties: UH)(
@@ -77,5 +93,7 @@ private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HLi
 
 private[cypherDSL] case class VariableLengthRelationship(variableLengthRelation: VariableLengthRelation)
     extends CypherEntity {
-  override def toQuery(context: Context): String = s"[${variableLengthRelation.toQuery(context)}]"
+  override def toQuery(context: Context): DSLResult = {
+    DSLResult(s"[${variableLengthRelation.toQuery(context)}]")
+  }
 }

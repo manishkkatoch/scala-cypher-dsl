@@ -8,8 +8,13 @@ import shapeless.{HList, HNil}
 import scala.util.Try
 
 private[cypherDSL] class Path(val pathLinks: PathLink*) {
-  def toQuery(context: Context = new Context()): String =
-    pathLinks.map(_.toQuery(context)).mkString
+  def toQuery(context: Context = new Context()): DSLResult = {
+    val (queryList, paramMap) =
+      pathLinks.map(_.toQuery(context)).foldLeft((List.empty[String], Map.empty[String, Any])) { (acc, result) =>
+        (acc._1 :+ result.query, acc._2 ++ result.queryMap)
+      }
+    DSLResult(queryList.mkString, paramMap)
+  }
 
   def |[T <: Product, TH <: HList, U <: Product, UH <: HList](rel: U)(
       implicit queryProvider: QueryProvider[U]): Path = {

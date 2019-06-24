@@ -1,6 +1,6 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
 
-import me.manishkatoch.scala.cypherDSL.spec.Context
+import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
 import me.manishkatoch.scala.cypherDSL.spec.entities.OrderingProduct
 import me.manishkatoch.scala.cypherDSL.spec.utils.ElementPropertyExtractingAndAliasing
 
@@ -9,7 +9,7 @@ private[cypherDSL] class OrdersBy(descendingOrder: Boolean, elements: OrderingPr
     with ElementPropertyExtractingAndAliasing {
   private val errorMessage = "One or more of the elements to be returned are not in Context!"
 
-  override def toQuery(context: Context): String = {
+  override def toQuery(context: Context): DSLResult = {
     val ids = elements
       .map(element => {
         val (el, properties) = getElementAndProperties(element.element)
@@ -19,7 +19,7 @@ private[cypherDSL] class OrdersBy(descendingOrder: Boolean, elements: OrderingPr
           .getOrElse(throw new NoSuchElementException(errorMessage))
       })
       .mkString(",")
-    (if (ids.nonEmpty) s"ORDER BY $ids $getOrderingString" else "").trim
+    DSLResult((if (ids.nonEmpty) s"ORDER BY $ids $getOrderingString" else "").trim)
   }
 
   private def makeAliasedReturnString(identifier: String, properties: List[String]): String = {

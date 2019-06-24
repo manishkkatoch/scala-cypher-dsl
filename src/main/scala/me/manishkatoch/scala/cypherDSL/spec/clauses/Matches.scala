@@ -6,7 +6,10 @@ import shapeless.ops.hlist.ToTraversable
 import shapeless.{HList, HNil}
 
 private[spec] class Matches(path: Path) extends Clause {
-  override def toQuery(context: Context = new Context()): String = s"MATCH ${path.toQuery(context)}"
+  override def toQuery(context: Context = new Context()): DSLResult = {
+    val result = path.toQuery(context)
+    result.copy(query = s"MATCH ${result.query}")
+  }
 }
 
 private[spec] object Matches {

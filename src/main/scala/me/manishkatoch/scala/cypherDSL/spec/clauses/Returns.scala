@@ -1,6 +1,6 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
 
-import me.manishkatoch.scala.cypherDSL.spec.Context
+import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
 import me.manishkatoch.scala.cypherDSL.spec.entities.AliasedProduct
 import me.manishkatoch.scala.cypherDSL.spec.operators.Operator
 import me.manishkatoch.scala.cypherDSL.spec.utils.ElementPropertyExtractingAndAliasing
@@ -11,7 +11,7 @@ private[cypherDSL] class Returns(elements: Either[AliasedProduct, Operator]*)
   private val errorMessage = "One or more of the elements to be returned are not in Context!"
 
   @throws[NoSuchElementException]
-  def toQuery(context: Context = new Context()): String = {
+  def toQuery(context: Context = new Context()): DSLResult = {
     val ids = elements
       .map(element => {
         if (element.isRight) element.right.get.toQuery(context)
@@ -26,7 +26,7 @@ private[cypherDSL] class Returns(elements: Either[AliasedProduct, Operator]*)
       })
       .mkString(",")
 
-    if (ids.nonEmpty) s"RETURN $ids" else ""
+    DSLResult(if (ids.nonEmpty) s"RETURN $ids" else "")
   }
 }
 private[cypherDSL] object Returns {
