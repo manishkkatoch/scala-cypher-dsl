@@ -1,4 +1,4 @@
-# scala-cypher-dsl [![Build Status](https://travis-ci.org/manishkkatoch/scala-cypher-dsl.svg?branch=master)](https://travis-ci.org/manishkkatoch/scala-cypher-dsl) ![Sonatype Nexus (Releases)](https://img.shields.io/nexus/r/https/oss.sonatype.org/me.manishkatoch/scala-cypher-dsl.svg)
+# scala-cypher-dsl [![Build Status](https://travis-ci.org/manishkkatoch/scala-cypher-dsl.svg?branch=master)](https://travis-ci.org/manishkkatoch/scala-cypher-dsl) ![Sonatype Nexus (Releases)](https://img.shields.io/nexus/r/https/oss.sonatype.org/me.manishkatoch/scala-cypher-dsl.svg) ![Maven Central](https://img.shields.io/maven-central/v/me.manishkatoch/scala-cypher-dsl.svg)
 
 A type safe DSL for writing Cypher Query Language in Scala.
 
