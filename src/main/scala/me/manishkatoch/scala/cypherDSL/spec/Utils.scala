@@ -1,28 +1,26 @@
 package me.manishkatoch.scala.cypherDSL.spec
-
 import shapeless.{::, HList, HNil}
 
+/** provides various utility methods to the cypherDSL */
 private object Utils {
 
-  def matchPropertyPattern(identifier: String, propertyName: String) =
-    s"$propertyName: {${propertyValuePlaceHolder(identifier,propertyName)}}"
-
-  def propertyValuePlaceHolder(identifier: String, propertyName: String) = s"${identifier}_$propertyName"
-
-  def toList[H <: HList](list: H): List[String] = {
-    def lpToList(list: HList): List[String] = list match {
-      case HNil                => List.empty
-      case (s: Symbol) :: tail => s.name +: lpToList(tail)
-      case s :: tail           => s.toString +: lpToList(tail)
+  /**
+  * Implicitly adds toList to an HList
+    * @param list an HList to be converted to [[List]]
+    * @tparam H where H <: HList
+    */
+  implicit class ListableHList[H <: HList](list: H) {
+    /**
+    * returns a [[List]] from [[HList]]
+      * @tparam T expected return type
+      * @return [[List]] of [[T]]
+      */
+    def toList[T]: List[T] = {
+      def lpToList(list: HList): List[T] = list match {
+        case HNil => List.empty
+        case s :: tail => s.asInstanceOf[T] +: lpToList(tail)
+      }
+      lpToList(list)
     }
-    lpToList(list)
-  }
-  def toAnyList[H <: HList](list: H): List[Any] = {
-    def lpToList(list: HList): List[Any] = list match {
-      case HNil                => List.empty
-      case (s: Symbol) :: tail => s.name +: lpToList(tail)
-      case s :: tail           => s +: lpToList(tail)
-    }
-    lpToList(list)
   }
 }

@@ -2,7 +2,18 @@ package me.manishkatoch.scala.cypherDSL.spec
 
 import me.manishkatoch.scala.cypherDSL.spec.clauses.Clause
 
-private[cypherDSL] case class Statement(clauses: Seq[Clause]) {
+/** Statement is the basic building block of Cypher. A Statement contains one or more [[Clause]].
+  * The [[Statement]] returns a [[DSLResult]] which is a result of computation of all [[Clause]]s the statement contains
+  *
+  * @param clauses [[Seq]] of [[Clause]]
+  */
+
+private[cypherDSL] case class Statement(private[cypherDSL] val clauses: Seq[Clause]) {
+  /**
+  * Returns a [[DSLResult]] for this statement
+    * @param context any [[Context]] that needs to be reused. Defaults to creating new [[Context]]
+    * @return [[DSLResult]]
+    */
   def toQuery(context: Context = new Context()): DSLResult = {
     val (queryList, paramMap) = clauses.map(clause => clause.toQuery(context))
     .foldLeft((List.empty[String], Map.empty[String,Any])) {(acc, result) =>
@@ -12,6 +23,11 @@ private[cypherDSL] case class Statement(clauses: Seq[Clause]) {
   }
 }
 
+/** Factory for [[me.manishkatoch.scala.cypherDSL.spec.Statement]] instances */
 private[cypherDSL] object Statement {
+
+  /** Creates [[Statement]] with no [[Clause]]
+    * @return
+    */
   def apply(): Statement = new Statement(Seq.empty)
 }

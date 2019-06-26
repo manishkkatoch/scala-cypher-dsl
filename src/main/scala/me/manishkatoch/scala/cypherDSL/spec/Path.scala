@@ -74,20 +74,4 @@ private[cypherDSL] class Path(val pathLinks: PathLink*) {
       (pathLinks.take(pathLinks.length - 1) :+ lastLink) ++
         path.pathLinks: _*)
   }
-
-//
-//  def |->[U <: Product, UH <: HList](rel: U)(implicit queryProvider: QueryProvider[U]): Path = {
-//    new Path(pathLinks :+ PathLink(Some("->"), Node(rel, HNil), None): _*)
-//  }
-//  def |->[U <: Product](rel: NodeType): Path = {
-//    new Path(pathLinks :+ PathLink(Some("->"), rel, None): _*)
-//  }
-//
-
-//
-
-//
-//  def |-[U <: Product, UH <: HList](rel: U)(implicit qpu: QueryProvider[U]): Path = {
-//    new Path(pathLinks :+ PathLink(Some("-"), Node(rel, HNil), None): _*)
-//  }
 }
