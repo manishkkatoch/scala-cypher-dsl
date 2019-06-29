@@ -1,13 +1,11 @@
 package me.manishkatoch.scala.cypherDSL.spec.syntax
 
-import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
 import me.manishkatoch.scala.cypherDSL.spec.syntax.patterns._
 import me.manishkatoch.scala.cypherDSL.spec.utils.Random.randomize
 import me.manishkatoch.scala.cypherDSL.spec.utils.TestClasses.ImplicitCache._
 import me.manishkatoch.scala.cypherDSL.spec.utils.TestClasses._
+import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
 import org.scalatest.{Matchers, WordSpec}
-
-import scala.reflect.runtime.universe.weakTypeOf
 class PatternsTest extends WordSpec with Matchers {
 
   "Patterns" should {
@@ -1126,7 +1124,7 @@ class PatternsTest extends WordSpec with Matchers {
           }
           "A -[C*1..3]- B" in {
             val path = anyPerson -|* (anyDeptHead, 1 to 3) |- anyDept
-            path.toQuery(context) shouldBe DSLResult("(a6)-[a13:HEAD_OF_DEPARTMENT*1..3]-(a7)")
+            path.toQuery(context) shouldBe DSLResult("(a6)-[a8*1..3]-(a7)")
           }
           "A -[C{}*1..3]- B" in {
             val path = anyPerson -|* (deptHead, 1 to 3) |- anyDept
@@ -1138,11 +1136,11 @@ class PatternsTest extends WordSpec with Matchers {
           }
           "A{} -[C*1..3]- B{}" in {
             val path = person -|* (anyDeptHead, 1 to 3) |- dept
-            path.toQuery(context) shouldBe DSLResult("(a0)-[a14:HEAD_OF_DEPARTMENT*1..3]-(a1)")
+            path.toQuery(context) shouldBe DSLResult("(a0)-[a8*1..3]-(a1)")
           }
           "A -[C*1]- B" in {
             val path = anyPerson -|* (anyDeptHead, 1) |- anyDept
-            path.toQuery(context) shouldBe DSLResult("(a6)-[a15:HEAD_OF_DEPARTMENT*1]-(a7)")
+            path.toQuery(context) shouldBe DSLResult("(a6)-[a8*1]-(a7)")
           }
           "A -[C{}*1]- B" in {
             val path = anyPerson -|* (deptHead, 1) |- anyDept
@@ -1154,11 +1152,11 @@ class PatternsTest extends WordSpec with Matchers {
           }
           "A{} -[C*1]- B{}" in {
             val path = person -|* (anyDeptHead, 1) |- dept
-            path.toQuery(context) shouldBe DSLResult("(a0)-[a16:HEAD_OF_DEPARTMENT*1]-(a1)")
+            path.toQuery(context) shouldBe DSLResult("(a0)-[a8*1]-(a1)")
           }
           "A -[C*]- B" in {
             val path = anyPerson -|* anyDeptHead |- anyDept
-            path.toQuery(context) shouldBe DSLResult("(a6)-[a17:HEAD_OF_DEPARTMENT*]-(a7)")
+            path.toQuery(context) shouldBe DSLResult("(a6)-[a8*]-(a7)")
           }
           "A -[C{}*]- B" in {
             val path = anyPerson -|* deptHead |- anyDept
@@ -1170,7 +1168,7 @@ class PatternsTest extends WordSpec with Matchers {
           }
           "A{} -[C*]- B{}" in {
             val path = person -|* anyDeptHead |- dept
-            path.toQuery(context) shouldBe DSLResult("(a0)-[a18:HEAD_OF_DEPARTMENT*]-(a1)")
+            path.toQuery(context) shouldBe DSLResult("(a0)-[a8*]-(a1)")
           }
         }
       }

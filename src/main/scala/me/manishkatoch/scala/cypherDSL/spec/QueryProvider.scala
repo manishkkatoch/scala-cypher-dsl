@@ -23,6 +23,10 @@ trait QueryProvider[T <: Product] {
     * @return
     */
   def getMatchers[U <: HList](element: T, columns: U)(implicit context: Context): Seq[DSLResult]
+  def getSetters(element: T)(implicit context: Context): Seq[DSLResult]
+
+  def getSetters[U <: HList](element: T, columns: U)(implicit context: Context): Seq[DSLResult]
+
 }
 
 /** Factory for [[me.manishkatoch.scala.cypherDSL.spec.QueryProvider]] instances */
@@ -47,7 +51,7 @@ object QueryProvider {
       override def getMatchers(element: T)(implicit context: Context): Seq[DSLResult] = {
         val id     = context.get(element).get
         val record = keys().toList[Symbol].map(_.name) zip lGen.to(element).toList[Any]
-        recordToDSLResults(id, record)
+        recordToDSLResults(id, record)(matchPropertyPattern)
       }
 
       override def getMatchers[U <: HList](element: T, columns: U)(implicit context: Context): Seq[DSLResult] = {
@@ -55,19 +59,39 @@ object QueryProvider {
         val record         = keys().toList[Symbol].map(_.name) zip lGen.to(element).toList[Any]
         val columnList     = columns.toList[Symbol].map(_.name)
         val filteredRecord = record.filter(t => columnList.contains(t._1))
-        recordToDSLResults(id, filteredRecord)
+        recordToDSLResults(id, filteredRecord)(matchPropertyPattern)
       }
 
-      private def recordToDSLResults(id: String, record: Seq[(String, Any)]): Seq[DSLResult] =
-        record.map(tuple => {
-          val (key, value)        = tuple
-          val queryString         = matchPropertyPattern(id, key)
-          val propertyPlaceHolder = propertyValuePlaceHolder(id, key)
-          DSLResult(queryString, Map(propertyPlaceHolder -> value))
-        })
+      override def getSetters(element: T)(implicit context: Context): Seq[DSLResult] = {
+        val id     = context.get(element).get
+        val record = keys().toList[Symbol].map(_.name) zip lGen.to(element).toList[Any]
+        recordToDSLResults(id, record)(setPropertyPattern)
+      }
+
+      override def getSetters[U <: HList](element: T, columns: U)(implicit context: Context): Seq[DSLResult] = {
+        val id             = context.get(element).get
+        val record         = keys().toList[Symbol].map(_.name) zip lGen.to(element).toList[Any]
+        val columnList     = columns.toList[Symbol].map(_.name)
+        val filteredRecord = record.filter(t => columnList.contains(t._1))
+        recordToDSLResults(id, filteredRecord)(setPropertyPattern)
+      }
+
+      private def recordToDSLResults(id: String, record: Seq[(String, Any)])(
+          queryStringGenerator: (String,String) => String,
+          mapper: (String, (String, Any)) => Map[String, Any] = defaultMapper
+      ): Seq[DSLResult] =
+        record.map(tuple => DSLResult(queryStringGenerator(id, tuple._1), mapper(id, tuple)))
+
+      private def defaultMapper(id: String, keyValuePair: (String, Any)): Map[String, Any] = {
+        val (key, value) = keyValuePair
+        Map(propertyValuePlaceHolder(id, key) -> value)
+      }
 
       private def matchPropertyPattern(identifier: String, propertyName: String) =
         s"$propertyName: {${propertyValuePlaceHolder(identifier, propertyName)}}"
+
+      private def setPropertyPattern(identifier: String, propertyName: String) =
+        s"$identifier.$propertyName = {${propertyValuePlaceHolder(identifier, propertyName)}}"
 
       private def propertyValuePlaceHolder(identifier: String, propertyName: String) = s"${identifier}_$propertyName"
 

@@ -27,7 +27,7 @@ class WithTest extends WordSpec with Matchers with BeforeAndAfterEach {
     }
 
     "WITH empty statement if no elements passed" in {
-      With().toQuery(context) shouldBe DSLResult("")
+      With().toQuery(context) shouldBe DSLResult.empty
     }
 
     "WITH query for more than one element in Context" in {

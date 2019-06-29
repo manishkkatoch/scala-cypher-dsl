@@ -1,7 +1,7 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
 
 import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
-import me.manishkatoch.scala.cypherDSL.spec.entities.AliasedProduct
+import me.manishkatoch.scala.cypherDSL.spec.entities.{AliasedProduct, CypherType}
 import me.manishkatoch.scala.cypherDSL.spec.operators.Operator
 import me.manishkatoch.scala.cypherDSL.spec.utils.ElementPropertyExtractingAndAliasing
 

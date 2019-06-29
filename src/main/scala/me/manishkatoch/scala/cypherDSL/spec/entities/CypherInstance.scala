@@ -14,17 +14,27 @@ private[spec] sealed abstract class CypherInstance[T <: Product: QueryProvider, 
   def toQuery(context: Context = new Context()): DSLResult = {
     context.map(element)(getIdentifierOnlyQuery).getOrElse {
       val id = context.add(element)
-      getQueryBasedOnProperties(id, context)
+      makeExpandedQuery(id, getQueryBasedOnProperties(id, context))
     }
+  }
+
+  override def toSetterQuery(context: Context): DSLResult = {
+    implicit val lowPriorityContext: Context = context
+    context.map(element){ id =>
+      val r = properties match {
+        case _: HNil => queryProvider.getSetters(element)
+        case _ => queryProvider.getSetters(element, properties)
+      }
+      r.reduce(_ ++ (_,","))
+    }.get
   }
 
   private def getQueryBasedOnProperties(id: String, context: Context) = {
     implicit val lowPriorityContext: Context = context
-    val matchers = properties match {
+    properties match {
       case _: HNil => queryProvider.getMatchers(element)
       case _       => queryProvider.getMatchers(element, properties)
     }
-    makeExpandedQuery(id, matchers)
   }
 
   private def makeExpandedQuery(id: String, parts: Seq[DSLResult]) = {
@@ -94,6 +104,9 @@ private[cypherDSL] case class Relationship[T <: Product: QueryProvider, H <: HLi
 private[cypherDSL] case class VariableLengthRelationship(variableLengthRelation: VariableLengthRelation)
     extends CypherEntity {
   override def toQuery(context: Context): DSLResult = {
+    DSLResult(s"[${variableLengthRelation.toQuery(context)}]")
+  }
+  override def toSetterQuery(context: Context): DSLResult = {
     DSLResult(s"[${variableLengthRelation.toQuery(context)}]")
   }
 }

@@ -3,6 +3,7 @@ package me.manishkatoch.scala.cypherDSL.spec.clauses
 import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
 import me.manishkatoch.scala.cypherDSL.spec.syntax.any
 import me.manishkatoch.scala.cypherDSL.spec.syntax.patterns._
+import me.manishkatoch.scala.cypherDSL.spec.syntax.v1._
 import me.manishkatoch.scala.cypherDSL.spec.utils.Random._
 import me.manishkatoch.scala.cypherDSL.spec.utils.TestClasses.ImplicitCache._
 import me.manishkatoch.scala.cypherDSL.spec.utils.TestClasses.{Department, Person}
@@ -27,8 +28,14 @@ class ReturnsTest extends WordSpec with Matchers {
     "return query for any element in Context" in {
       Returns(anyPerson).toQuery(context) shouldBe DSLResult("RETURN a2")
     }
+    "return query for anyRelation element in Context" in {
+      val newContext = new Context()
+      val anyRel = anyRelation
+      Matches(personA -| anyRel |-> departmentA).toQuery(newContext)
+      Returns(anyRel).toQuery(newContext) shouldBe DSLResult("RETURN a1")
+    }
     "return empty statement if no elements passed" in {
-      Returns().toQuery(context) shouldBe DSLResult("")
+      Returns().toQuery(context) shouldBe DSLResult.empty
     }
     "return query for more than one element in Context" in {
       Returns(personA, departmentA).toQuery(context) shouldBe DSLResult("RETURN a0,a1")

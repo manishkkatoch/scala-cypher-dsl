@@ -17,6 +17,15 @@ class RelationTypeOrInstance(either: Either[RelationType, Relationship[_, _]]) e
       result.copy(query = result.query.stripSemanticSugar)
     })
   }
+
+  override def toSetterQuery(context: Context = new Context()): DSLResult = {
+    either.fold(relationType => {
+      DSLResult(relationType.label)
+    }, relationship => {
+      val result = relationship.toSetterQuery(context)
+      result.copy(query = result.query.stripSemanticSugar)
+    })
+  }
 }
 object RelationTypeOrInstance {
   def apply(tpe: RelationType): RelationTypeOrInstance =

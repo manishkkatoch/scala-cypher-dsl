@@ -1,14 +1,15 @@
 package me.manishkatoch.scala.cypherDSL.spec.utils
 
-import me.manishkatoch.scala.cypherDSL.spec.entities.Node
+import me.manishkatoch.scala.cypherDSL.spec.entities.{Node, RelationType}
 import me.manishkatoch.scala.cypherDSL.spec.Utils._
 
 private[cypherDSL] trait ElementPropertyExtractingAndAliasing {
   private val tooManyPropertiesToAliasMessage = "Alias one property at a time!"
 
-  def getElementAndProperties(element: Product): (Product, List[String]) =
+  def getElementAndProperties(element: Product): (Any, List[String]) =
     element match {
       case s: Node[_, _] => (s.element, s.properties.toList[Symbol].map(_.name))
+      case s: RelationType => (s.fingerprint, List.empty[String])
       case s             => (s, List.empty[String])
     }
 

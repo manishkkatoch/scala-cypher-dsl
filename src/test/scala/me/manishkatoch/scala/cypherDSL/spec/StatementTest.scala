@@ -23,7 +23,7 @@ class StatementTest extends WordSpec with Matchers {
       )
     }
     "return empty result if passed no clauses" in {
-      Statement().toQuery() shouldBe DSLResult("")
+      Statement().toQuery() shouldBe DSLResult.empty
     }
   }
 

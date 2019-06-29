@@ -38,6 +38,126 @@ class SyntaxV1Test extends WordSpec with Matchers {
       )
     }
   }
+  "CREATE" should {
+    "provide query for an instance" in {
+      cypher.CREATE(person).toQuery(new Context()) shouldBe DSLResult(
+        "CREATE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})",
+        Map("a0_id" -> person.id, "a0_name" -> person.name, "a0_age" -> person.age))
+    }
+    "provide query for a node" in {
+      cypher.CREATE(person('name)).toQuery(new Context()) shouldBe DSLResult("CREATE (a0:Person {name: {a0_name}})",
+                                                                            Map("a0_name" -> person.name))
+    }
+    "provide query for a class" in {
+      cypher.CREATE(anyPerson).toQuery(new Context()) shouldBe DSLResult("CREATE (a0:Person)")
+    }
+    "provide query for a path" in {
+      cypher.CREATE(person -| worksIn |-> dept).toQuery(new Context()) shouldBe DSLResult(
+        "CREATE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})",
+        Map("a0_id"        -> person.id,
+            "a0_name"      -> person.name,
+            "a0_age"       -> person.age,
+            "a1_sinceDays" -> worksIn.sinceDays,
+            "a2_id"        -> dept.id,
+            "a2_name"      -> dept.name)
+      )
+    }
+  }
+  "MERGE" should {
+    "provide query for an instance" in {
+      cypher.MERGE(person).toQuery(new Context()) shouldBe DSLResult(
+        "MERGE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})",
+        Map("a0_id" -> person.id, "a0_name" -> person.name, "a0_age" -> person.age))
+    }
+    "provide query for a node" in {
+      cypher.MERGE(person('name)).toQuery(new Context()) shouldBe DSLResult("MERGE (a0:Person {name: {a0_name}})",
+        Map("a0_name" -> person.name))
+    }
+    "provide query for a class" in {
+      cypher.MERGE(anyPerson).toQuery(new Context()) shouldBe DSLResult("MERGE (a0:Person)")
+    }
+    "provide query for a path" in {
+      cypher.MERGE(person -| worksIn |-> dept).toQuery(new Context()) shouldBe DSLResult(
+        "MERGE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})",
+        Map("a0_id"        -> person.id,
+          "a0_name"      -> person.name,
+          "a0_age"       -> person.age,
+          "a1_sinceDays" -> worksIn.sinceDays,
+          "a2_id"        -> dept.id,
+          "a2_name"      -> dept.name)
+      )
+    }
+  }
+  "DELETE" should {
+    "provide query for an instance" in {
+      cypher.DELETE(person).toQuery(new Context()) shouldBe DSLResult(
+        "DELETE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})",
+        Map("a0_id" -> person.id, "a0_name" -> person.name, "a0_age" -> person.age))
+    }
+    "provide query for a node" in {
+      cypher.DELETE(person('name)).toQuery(new Context()) shouldBe DSLResult("DELETE (a0:Person {name: {a0_name}})",
+        Map("a0_name" -> person.name))
+    }
+    "provide query for a class" in {
+      cypher.DELETE(anyPerson).toQuery(new Context()) shouldBe DSLResult("DELETE (a0:Person)")
+    }
+    "provide query for a path" in {
+      cypher.DELETE(person -| worksIn |-> dept).toQuery(new Context()) shouldBe DSLResult(
+        "DELETE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})",
+        Map("a0_id"        -> person.id,
+          "a0_name"      -> person.name,
+          "a0_age"       -> person.age,
+          "a1_sinceDays" -> worksIn.sinceDays,
+          "a2_id"        -> dept.id,
+          "a2_name"      -> dept.name)
+      )
+    }
+  }
+  "DETACH_DELETE" should {
+    "provide query for an instance" in {
+      cypher.DETACH_DELETE(person).toQuery(new Context()) shouldBe DSLResult(
+        "DETACH DELETE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})",
+        Map("a0_id" -> person.id, "a0_name" -> person.name, "a0_age" -> person.age))
+    }
+    "provide query for a node" in {
+      cypher.DETACH_DELETE(person('name)).toQuery(new Context()) shouldBe DSLResult("DETACH DELETE (a0:Person {name: {a0_name}})",
+        Map("a0_name" -> person.name))
+    }
+    "provide query for a class" in {
+      cypher.DETACH_DELETE(anyPerson).toQuery(new Context()) shouldBe DSLResult("DETACH DELETE (a0:Person)")
+    }
+    "provide query for a path" in {
+      cypher.DETACH_DELETE(person -| worksIn |-> dept).toQuery(new Context()) shouldBe DSLResult(
+        "DETACH DELETE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})",
+        Map("a0_id"        -> person.id,
+          "a0_name"      -> person.name,
+          "a0_age"       -> person.age,
+          "a1_sinceDays" -> worksIn.sinceDays,
+          "a2_id"        -> dept.id,
+          "a2_name"      -> dept.name)
+      )
+    }
+  }
+  "SET" should {
+    val context = new Context()
+    cypher.MATCH(person).toQuery(context)
+    cypher.MATCH(anyPerson).toQuery(context)
+    "provide query for an instance with setters" in {
+      cypher.SET(person, List(person('name) -> "tom")).toQuery(context) shouldBe DSLResult(
+        "SET a0 = {a0.name = {a0_name}}",
+        Map("a0_name" -> "tom"))
+    }
+    "provide query for an instance with no setters" in {
+      cypher.SET(person, List.empty).toQuery(context) shouldBe DSLResult(
+        "SET a0 = {}")
+    }
+    "provide query for a node" in {
+      cypher.SET(person('name) -> "tom", person('age) -> 12).toQuery(context) shouldBe
+        DSLResult("SET a0.name = {a0_name},a0.age = {a0_age}",
+        Map("a0_name" -> "tom", "a0_age" -> 12))
+    }
+
+  }
   "OPTIONAL_MATCH" should {
     "provide query for an instance" in {
       cypher.OPTIONAL_MATCH(person).toQuery(new Context()) shouldBe DSLResult(
@@ -86,7 +206,7 @@ class SyntaxV1Test extends WordSpec with Matchers {
       cypher.RETURN(anyPerson).toQuery(context) shouldBe DSLResult("RETURN a1")
     }
     "return empty statement if no elements passed" in {
-      cypher.RETURN().toQuery(context) shouldBe DSLResult("")
+      cypher.RETURN().toQuery(context) shouldBe DSLResult.empty
     }
     "return query for more than one element in Context" in {
       cypher.RETURN(person, anyPerson).toQuery(context) shouldBe DSLResult("RETURN a0,a1")
@@ -129,7 +249,7 @@ class SyntaxV1Test extends WordSpec with Matchers {
     }
 
     "WITH empty statement if no elements passed" in {
-      cypher.WITH().toQuery(context) shouldBe DSLResult("")
+      cypher.WITH().toQuery(context) shouldBe DSLResult.empty
     }
 
     "WITH query for more than one element in Context" in {
@@ -186,7 +306,7 @@ class SyntaxV1Test extends WordSpec with Matchers {
     }
 
     "return empty statement if no elements passed" in {
-      cypher.ORDER_BY().toQuery(context) shouldBe DSLResult("")
+      cypher.ORDER_BY().toQuery(context) shouldBe DSLResult.empty
     }
 
     "return query for more than one element in Context" in {
@@ -210,7 +330,7 @@ class SyntaxV1Test extends WordSpec with Matchers {
     }
 
     "return empty statement if no elements passed" in {
-      cypher.ORDER_BY_DESC().toQuery(context) shouldBe DSLResult("")
+      cypher.ORDER_BY_DESC().toQuery(context) shouldBe DSLResult.empty
     }
 
     "return query for more than one element in Context" in {

@@ -24,7 +24,7 @@ class OrdersByTest extends WordSpec with Matchers {
       }
 
       "return empty statement if no elements passed" in {
-        OrdersBy().toQuery(context) shouldBe DSLResult("")
+        OrdersBy().toQuery(context) shouldBe DSLResult.empty
       }
 
       "return query for more than one element in Context" in {
@@ -49,7 +49,7 @@ class OrdersByTest extends WordSpec with Matchers {
       }
 
       "return empty statement if no elements passed" in {
-        OrdersBy().toQuery(context) shouldBe DSLResult("")
+        OrdersBy().toQuery(context) shouldBe DSLResult.empty
       }
 
       "return query for more than one element in Context" in {
