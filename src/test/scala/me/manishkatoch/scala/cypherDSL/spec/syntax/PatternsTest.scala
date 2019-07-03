@@ -499,7 +499,7 @@ class PatternsTest extends WordSpec with Matchers {
             path.toQuery(context) shouldBe DSLResult("(a0)-->(a1)")
           }
           "A{} --> B{}" in {
-            val path = person('d) --> dept('name)
+            val path = person('id) --> dept('name)
             path.toQuery(context) shouldBe DSLResult("(a0)-->(a1)")
           }
           "A <-- B" in {

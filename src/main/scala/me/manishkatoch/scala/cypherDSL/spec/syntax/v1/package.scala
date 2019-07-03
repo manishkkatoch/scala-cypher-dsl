@@ -112,9 +112,8 @@ package object v1 {
       statement.copy(clauses = statement.clauses :+ Sets(element, setters))
     }
 
-    def SET[T <: Product, TH <: HList](setters: (Node[T, TH], Any)*)(
-      implicit queryProvider: QueryProvider[T],
-      i0: ToTraversable.Aux[TH, List, Symbol]): Statement = {
+    def SET[T <: Product](setters: (Node[T, _], Any)*)(
+      implicit queryProvider: QueryProvider[T]): Statement = {
       statement.copy(clauses = statement.clauses :+ Sets(setters:_*))
     }
 
