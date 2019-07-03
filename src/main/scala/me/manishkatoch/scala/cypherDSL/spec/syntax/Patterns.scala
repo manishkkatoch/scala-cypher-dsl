@@ -11,9 +11,9 @@ import scala.annotation.implicitNotFound
 private[spec] object Patterns {
 
   @implicitNotFound(msg = "${PName} not found in ${T}")
-  private trait PropertyExists[T, PName, PType]
+  trait PropertyExists[T, PName, PType]
 
-  private object PropertyExists {
+  object PropertyExists {
     def apply[T, PType](column: Witness)(
         implicit exists: PropertyExists[T, column.T, PType]): PropertyExists[T, column.T, PType] =
       exists
