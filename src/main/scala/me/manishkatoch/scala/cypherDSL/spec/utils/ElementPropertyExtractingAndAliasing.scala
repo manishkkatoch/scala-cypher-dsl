@@ -1,6 +1,6 @@
 package me.manishkatoch.scala.cypherDSL.spec.utils
 
-import me.manishkatoch.scala.cypherDSL.spec.entities.{Node, RelationType}
+import me.manishkatoch.scala.cypherDSL.spec.entities.{CypherType, Node, NodeType, RelationType}
 import me.manishkatoch.scala.cypherDSL.spec.Utils._
 
 private[cypherDSL] trait ElementPropertyExtractingAndAliasing {
@@ -8,9 +8,10 @@ private[cypherDSL] trait ElementPropertyExtractingAndAliasing {
 
   def getElementAndProperties(element: Product): (Any, List[String]) =
     element match {
-      case s: Node[_, _] => (s.element, s.properties.toList[Symbol].map(_.name))
+      case s: Node[_, _]   => (s.element, s.properties.toList[Symbol].map(_.name))
       case s: RelationType => (s.fingerprint, List.empty[String])
-      case s             => (s, List.empty[String])
+      case s: NodeType     => (s.fingerprint, List.empty[String])
+      case s               => (s, List.empty[String])
     }
 
   @throws[AssertionError]
