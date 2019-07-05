@@ -60,6 +60,26 @@ johnDoeQuery.query
 johnDoeQuery.queryMap
 //res1: scala.collection.immutable.Map[String,Any] = Map(a0_id -> AX31SD, a0_name -> John Doe, a0_age -> 50))
 ```
+
+match Person only by a property(e.g. name)
+```scala
+//for a person John Doe
+val johnDoe = Person("AX31SD", "John Doe", 50)
+
+//match and return Neo4J data
+val johnDoeQuery = cypher.MATCH(johnDoe('name))
+    .RETURN(johnDoe)
+    .toQuery()
+
+johnDoeQuery.query
+//res0: String = MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})
+//              RETURN a0
+
+johnDoeQuery.queryMap
+//res1: scala.collection.immutable.Map[String,Any] = Map(a0_id -> AX31SD, a0_name -> John Doe, a0_age -> 50))
+```
+> Note: if the property doesn't exist, compilation will fail.
+
 using DSL for matching any instance of model.
 ```scala
 //for any person
