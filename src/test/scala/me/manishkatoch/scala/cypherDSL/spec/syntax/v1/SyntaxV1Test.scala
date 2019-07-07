@@ -90,50 +90,52 @@ class SyntaxV1Test extends WordSpec with Matchers {
     }
   }
   "DELETE" should {
-    "provide query for an instance" in {
-      cypher.DELETE(person).toQuery(new Context()) shouldBe DSLResult(
-        "DELETE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})",
-        Map("a0_id" -> person.id, "a0_name" -> person.name, "a0_age" -> person.age))
+
+    "provide query for a node in path" in {
+      val anyDept = any[Department]
+      cypher.MATCH(person --> anyDept).DELETE(anyDept).toQuery(new Context()) shouldBe DSLResult(
+        """MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-->(a1:Department)
+          |DELETE a1""".stripMargin,
+        Map("a0_id"        -> person.id,
+          "a0_name"      -> person.name,
+          "a0_age"       -> person.age)
+      )
     }
-    "provide query for a node" in {
-      cypher.DELETE(person('name)).toQuery(new Context()) shouldBe DSLResult("DELETE (a0:Person {name: {a0_name}})",
-        Map("a0_name" -> person.name))
-    }
-    "provide query for a class" in {
-      cypher.DELETE(anyPerson).toQuery(new Context()) shouldBe DSLResult("DELETE (a0:Person)")
-    }
-    "provide query for a path" in {
-      cypher.DELETE(person -| worksIn |-> dept).toQuery(new Context()) shouldBe DSLResult(
-        "DELETE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})",
+
+    "provide query for a relation in path" in {
+      val anyWorksIn = anyRel[WorksIn]
+      cypher.MATCH(person -| anyWorksIn |-> dept).DELETE(anyWorksIn).toQuery(new Context()) shouldBe DSLResult(
+        """MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN]->(a2:Department {id: {a2_id},name: {a2_name}})
+          |DELETE a1""".stripMargin,
         Map("a0_id"        -> person.id,
           "a0_name"      -> person.name,
           "a0_age"       -> person.age,
-          "a1_sinceDays" -> worksIn.sinceDays,
           "a2_id"        -> dept.id,
           "a2_name"      -> dept.name)
       )
     }
   }
   "DETACH_DELETE" should {
-    "provide query for an instance" in {
-      cypher.DETACH_DELETE(person).toQuery(new Context()) shouldBe DSLResult(
-        "DETACH DELETE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})",
-        Map("a0_id" -> person.id, "a0_name" -> person.name, "a0_age" -> person.age))
+
+    "provide query for a node in path" in {
+      val anyDept = any[Department]
+      cypher.MATCH(person --> anyDept).DETACH_DELETE(anyDept).toQuery(new Context()) shouldBe DSLResult(
+        """MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-->(a1:Department)
+          |DETACH DELETE a1""".stripMargin,
+        Map("a0_id"        -> person.id,
+          "a0_name"      -> person.name,
+          "a0_age"       -> person.age)
+      )
     }
-    "provide query for a node" in {
-      cypher.DETACH_DELETE(person('name)).toQuery(new Context()) shouldBe DSLResult("DETACH DELETE (a0:Person {name: {a0_name}})",
-        Map("a0_name" -> person.name))
-    }
-    "provide query for a class" in {
-      cypher.DETACH_DELETE(anyPerson).toQuery(new Context()) shouldBe DSLResult("DETACH DELETE (a0:Person)")
-    }
-    "provide query for a path" in {
-      cypher.DETACH_DELETE(person -| worksIn |-> dept).toQuery(new Context()) shouldBe DSLResult(
-        "DETACH DELETE (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN {sinceDays: {a1_sinceDays}}]->(a2:Department {id: {a2_id},name: {a2_name}})",
+
+    "provide query for a relation in path" in {
+      val anyWorksIn = anyRel[WorksIn]
+      cypher.MATCH(person -| anyWorksIn |-> dept).DETACH_DELETE(anyWorksIn).toQuery(new Context()) shouldBe DSLResult(
+        """MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})-[a1:WORKS_IN]->(a2:Department {id: {a2_id},name: {a2_name}})
+          |DETACH DELETE a1""".stripMargin,
         Map("a0_id"        -> person.id,
           "a0_name"      -> person.name,
           "a0_age"       -> person.age,
-          "a1_sinceDays" -> worksIn.sinceDays,
           "a2_id"        -> dept.id,
           "a2_name"      -> dept.name)
       )

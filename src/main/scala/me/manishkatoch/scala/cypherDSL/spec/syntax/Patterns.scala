@@ -388,17 +388,26 @@ private[spec] object Patterns {
     def --[U <: Product, UH <: HList](rel: Node[U, UH])(implicit qpT: QueryProvider[T]) =
       new Path(PathLink(None, Node(element, HNil), Some("-")), PathLink(Some("-"), rel, None))
 
+    def --(node: NodeType)(implicit qpT: QueryProvider[T]) =
+      new Path(PathLink(None, Node(element, HNil), Some("-")), PathLink(Some("-"), node, None))
+
     def -->[U <: Product, UH <: HList](rel: U)(implicit qpT: QueryProvider[T], qpU: QueryProvider[U]) =
       new Path(PathLink(None, Node(element, HNil), Some("-")), PathLink(Some("->"), Node(rel, HNil), None))
 
     def -->[U <: Product, UH <: HList](rel: Node[U, UH])(implicit qpT: QueryProvider[T]) =
       new Path(PathLink(None, Node(element, HNil), Some("-")), PathLink(Some("->"), rel, None))
 
+    def -->(node: NodeType)(implicit qpT: QueryProvider[T]) =
+      new Path(PathLink(None, Node(element, HNil), Some("-")), PathLink(Some("->"), node, None))
+
     def <--[U <: Product, UH <: HList](rel: U)(implicit qpT: QueryProvider[T], qpU: QueryProvider[U]) =
       new Path(PathLink(None, Node(element, HNil), Some("<-")), PathLink(Some("-"), Node(rel, HNil), None))
 
     def <--[U <: Product, UH <: HList](rel: Node[U, UH])(implicit qpT: QueryProvider[T]) =
       new Path(PathLink(None, Node(element, HNil), Some("<-")), PathLink(Some("-"), rel, None))
+
+    def <--(node: NodeType)(implicit qpT: QueryProvider[T]) =
+      new Path(PathLink(None, Node(element, HNil), Some("<-")), PathLink(Some("-"), node, None))
 
     def <-|[U <: Product, UH <: HList](rel: Node[U, UH])(implicit qpU: QueryProvider[U],
                                                          qpT: QueryProvider[T],

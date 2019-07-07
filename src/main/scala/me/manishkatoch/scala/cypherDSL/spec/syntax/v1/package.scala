@@ -82,6 +82,9 @@ package object v1 {
     def DELETE(element: NodeType): Statement = {
       statement.copy(clauses = statement.clauses :+ Deletes(element, detaches = false))
     }
+    def DELETE(element: RelationType): Statement = {
+      statement.copy(clauses = statement.clauses :+ Deletes(element, detaches = false))
+    }
     def DELETE[T <: Product, TH <: HList](element: Node[T, TH])(implicit queryProvider: QueryProvider[T],
                                                                 i0: ToTraversable.Aux[TH, List, Symbol]): Statement = {
       statement.copy(clauses = statement.clauses :+ Deletes(element, detaches = false))
@@ -95,6 +98,9 @@ package object v1 {
       statement.copy(clauses = statement.clauses :+ Deletes(element, detaches = true))
     }
     def DETACH_DELETE(element: NodeType): Statement = {
+      statement.copy(clauses = statement.clauses :+ Deletes(element, detaches = true))
+    }
+    def DETACH_DELETE(element: RelationType): Statement = {
       statement.copy(clauses = statement.clauses :+ Deletes(element, detaches = true))
     }
     def DETACH_DELETE[T <: Product, TH <: HList](element: Node[T, TH])(
