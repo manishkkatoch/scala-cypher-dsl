@@ -14,13 +14,16 @@ private[cypherDSL] class Returns(elements: Either[AliasedProduct, Operator]*)
   def toQuery(context: Context = new Context()): DSLResult = {
     val ids = elements
       .map(element => {
-        if (element.isRight) element.right.get.toQuery(context)
+        if (element.isRight) element.right.get.toQuery(context).query
         else {
           val aliasedProduct   = element.left.get
-          val (el, properties) = getElementAndProperties(aliasedProduct.node)
-          context
-            .get(el)
-            .map(identifier => makeAliasedString(identifier, properties, aliasedProduct.alias))
+          context.get(aliasedProduct.node)
+            .map(id => (id, List.empty[String]))
+            .orElse {
+              val (el, properties) = getElementAndProperties(aliasedProduct.node)
+              Option((context.get(el).getOrElse(throw new NoSuchElementException(errorMessage)), properties))
+            }
+            .map(s => makeAliasedString(s._1, s._2, aliasedProduct.alias))
             .getOrElse(throw new NoSuchElementException(errorMessage))
         }
       })

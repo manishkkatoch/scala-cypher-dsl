@@ -19,6 +19,11 @@ class Context {
     id
   }
 
+  def add[T](element: T, identifier: String): String = {
+    objects += element -> identifier
+    identifier
+  }
+
   /** updates the [[Context]] for the given element by creating new identifier
     * @param element instance for which context needs to be updated
     * @param id new identifier [[String]]
@@ -30,6 +35,7 @@ class Context {
     id
   }
 
+  def clear: Unit = objects.clear()
   def get[T](element: T): Option[String]               = objects.get(element)
   def map[T, B](element: T)(f: String => B): Option[B] = objects.get(element).map(f)
 

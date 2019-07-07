@@ -14,16 +14,16 @@ class DistinctTest extends WordSpec with Matchers with BeforeAndAfterEach {
 
   "DISTINCT" should {
     "provide query for an aliased case class if no alias provided in context" in {
-      Distinct(AliasedProduct(person, None)).toQuery(context) shouldBe DSLResult("DISTINCT a0")
+      Distinct(person).toQuery(context) shouldBe DSLResult("DISTINCT a0")
     }
     "provide query for an aliased case class if alias provided in context" in {
-      Distinct(AliasedProduct(person, Option("worker"))).toQuery(context) shouldBe DSLResult("DISTINCT a0 as worker")
+      Distinct(person -> "worker").toQuery(context) shouldBe DSLResult("DISTINCT a0 as worker")
     }
     "provide query for an aliased node if no alias provided in context" in {
-      Distinct(AliasedProduct(person('name), None)).toQuery(context) shouldBe DSLResult("DISTINCT a0.name")
+      Distinct(person('name)).toQuery(context) shouldBe DSLResult("DISTINCT a0.name")
     }
     "provide query for an aliased node if alias provided in context" in {
-      Distinct(AliasedProduct(person('name), Option("workerName")))
+      Distinct(person('name) -> "workerName")
         .toQuery(context) shouldBe DSLResult("DISTINCT a0.name as workerName")
     }
   }

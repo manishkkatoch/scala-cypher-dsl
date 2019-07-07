@@ -2,6 +2,7 @@ package me.manishkatoch.scala.cypherDSL.spec.syntax
 
 import me.manishkatoch.scala.cypherDSL.spec.clauses._
 import me.manishkatoch.scala.cypherDSL.spec.entities.{CypherEntity, Node, NodeType, RelationType, Relationship}
+import me.manishkatoch.scala.cypherDSL.spec.operators.Distinct
 import me.manishkatoch.scala.cypherDSL.spec.{Path, QueryProvider, Statement}
 import shapeless.HList
 import shapeless.ops.hlist.ToTraversable
@@ -133,6 +134,7 @@ package object v1 {
     def WITH[T <: Product](elements: T*): Statement = {
       statement.copy(clauses = statement.clauses :+ With(elements: _*))
     }
+
 
     def ORDER_BY[T <: Product](elements: T*): Statement = {
       statement.copy(clauses = statement.clauses :+ OrdersBy(elements: _*))

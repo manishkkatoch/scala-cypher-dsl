@@ -1,5 +1,6 @@
 package me.manishkatoch.scala.cypherDSL.spec.syntax.v1
 
+import me.manishkatoch.scala.cypherDSL.spec.operators.Distinct
 import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
 import me.manishkatoch.scala.cypherDSL.spec.syntax.patterns._
 import me.manishkatoch.scala.cypherDSL.spec.utils.Random.randomize
@@ -200,15 +201,23 @@ class SyntaxV1Test extends WordSpec with Matchers {
     context.add(anyPerson)
     context.add(dept)
     "return query for an element in Context" in {
+      val context = new Context()
+      context.add(person)
       cypher.RETURN(person).toQuery(context) shouldBe DSLResult("RETURN a0")
     }
     "return query for any element in Context" in {
+      val context = new Context()
+      context.add(person)
+      cypher.MATCH(anyPerson).toQuery(context)
       cypher.RETURN(anyPerson).toQuery(context) shouldBe DSLResult("RETURN a1")
     }
     "return empty statement if no elements passed" in {
       cypher.RETURN().toQuery(context) shouldBe DSLResult.empty
     }
     "return query for more than one element in Context" in {
+      val context = new Context()
+      context.add(person)
+      cypher.MATCH(anyPerson).toQuery(context)
       cypher.RETURN(person, anyPerson).toQuery(context) shouldBe DSLResult("RETURN a0,a1")
     }
     "return elements for a property" in {
@@ -239,26 +248,54 @@ class SyntaxV1Test extends WordSpec with Matchers {
         .RETURN(person('name) -> "name", person('age) -> "age", dept('name) -> "departmentName")
         .toQuery(context) shouldBe DSLResult("RETURN a0.name as name,a0.age as age,a2.name as departmentName")
     }
+    "RETURN DISTINCT aliased elements" in {
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
+      cypher
+        .RETURN(Distinct(person -> "pers", dept -> "department"))
+        .toQuery(context) shouldBe DSLResult("RETURN DISTINCT a0 as pers,a1 as department")
+    }
+    "RETURN DISTINCT  aliased elements for multiple properties" in {
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
+      cypher
+        .RETURN(Distinct(person('name) -> "name", person('age) -> "age", dept('name) -> "departmentName"))
+        .toQuery(context) shouldBe DSLResult("RETURN DISTINCT a0.name as name,a0.age as age,a1.name as departmentName")
+    }
   }
   "WITH" should {
     val context = new Context()
     context.add(person)
     context.add(dept)
     "WITH query for an element in Context" in {
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
       cypher.WITH(person).toQuery(context) shouldBe DSLResult("WITH a0")
     }
 
     "WITH empty statement if no elements passed" in {
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
       cypher.WITH().toQuery(context) shouldBe DSLResult.empty
     }
 
     "WITH query for more than one element in Context" in {
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
       cypher.WITH(person, dept).toQuery(context) shouldBe DSLResult("WITH a0,a1")
     }
     "WITH elements for a property" in {
       cypher.WITH(person('name), dept).toQuery(context) shouldBe DSLResult("WITH a0.name,a1")
     }
     "WITH elements for multiple properties" in {
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
       cypher.WITH(person('name, 'age), dept('name)).toQuery(context) shouldBe DSLResult("WITH a0.name,a0.age,a1.name")
     }
     "throw if element to be WITHed not in Context" in {
@@ -287,13 +324,41 @@ class SyntaxV1Test extends WordSpec with Matchers {
         "WITH a0.name as personName,a1 as dept")
     }
     "WITH aliased elements for multiple properties" in {
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
       cypher
         .WITH(person('name) -> "name", person('age) -> "age", dept('name) -> "departmentName")
         .toQuery(context) shouldBe DSLResult("WITH a0.name as name,a0.age as age,a1.name as departmentName")
     }
+    "WITH DISTINCT aliased elements" in {
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
+      cypher
+        .WITH(Distinct(person -> "pers", dept -> "department"))
+        .toQuery(context) shouldBe DSLResult("WITH DISTINCT a0 as pers,a1 as department")
+    }
+    "WITH DISTINCT  aliased elements for multiple properties" in {
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
+      cypher
+        .WITH(Distinct(person('name) -> "name"), dept('name) -> "departmentName")
+        .RETURN(person('name))
+        .toQuery(context) shouldBe DSLResult(
+          """WITH DISTINCT a0.name as name,a1.name as departmentName
+            |RETURN name""".stripMargin)
+    }
     "WITH aliased elements should return alias going forward" in {
-      cypher.WITH(person -> "p").toQuery(context)
-      cypher.RETURN(person).toQuery(context) shouldBe DSLResult("RETURN p")
+      val context = new Context()
+      context.add(person)
+      context.add(dept)
+      val anyPerson = any[Person]
+      val anyRel = anyRelation
+      cypher.MATCH(anyPerson -| anyRel |-> anyNode).toQuery(context)
+      cypher.WITH(person -> "p", anyPerson -> "p2", anyRel -> "ar").toQuery(context)
+      cypher.RETURN(person, anyPerson, anyRel).toQuery(context) shouldBe DSLResult("RETURN p,p2,ar")
     }
   }
   "ORDER_BY" should {

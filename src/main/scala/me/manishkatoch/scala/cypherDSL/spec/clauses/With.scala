@@ -1,9 +1,10 @@
 package me.manishkatoch.scala.cypherDSL.spec.clauses
 
 import me.manishkatoch.scala.cypherDSL.spec.{Context, DSLResult}
-import me.manishkatoch.scala.cypherDSL.spec.entities.AliasedProduct
+import me.manishkatoch.scala.cypherDSL.spec.entities.{AliasedProduct, Node, Relationship}
 import me.manishkatoch.scala.cypherDSL.spec.operators.Operator
 import me.manishkatoch.scala.cypherDSL.spec.utils.ElementPropertyExtractingAndAliasing
+import me.manishkatoch.scala.cypherDSL.spec.Utils._
 
 private[cypherDSL] class With(elements: Either[AliasedProduct, Operator]*)
     extends Clause
@@ -14,14 +15,23 @@ private[cypherDSL] class With(elements: Either[AliasedProduct, Operator]*)
   def toQuery(context: Context = new Context()): DSLResult = {
     val ids = elements
       .map(element => {
-        if (element.isRight) element.right.get.toQuery(context)
+        if (element.isRight) element.right.get.toQuery(context).query
         else {
           val aliasedProduct   = element.left.get
           val (el, properties) = getElementAndProperties(aliasedProduct.node)
           context
             .get(el)
             .map(identifier => {
-              if (aliasedProduct.alias.isDefined) context.update(aliasedProduct.node, aliasedProduct.alias.get)
+              val hasProperties = (aliasedProduct.node match {
+                case s: Node[_, _] => s.properties.toList.length
+                case s: Relationship[_, _] => s.properties.toList.length
+                case s => 0
+              }) > 0
+              if (aliasedProduct.alias.isDefined && !hasProperties) context.update(el, aliasedProduct.alias.get)
+              else {
+                context.add(aliasedProduct.node)
+                if(aliasedProduct.alias.isDefined) context.update(aliasedProduct.node, aliasedProduct.alias.get)
+              }
               makeAliasedString(identifier, properties, aliasedProduct.alias)
             })
             .getOrElse(throw new NoSuchElementException(errorMessage))
