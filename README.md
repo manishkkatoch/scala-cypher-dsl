@@ -20,11 +20,11 @@ Binary release artefacts are published to the Sonatype OSS Repository Hosting se
 
 #### SBT
 ```sbt
-"me.manishkatoch" %% "scala-cypher-dsl" % "0.4.4"
+"me.manishkatoch" %% "scala-cypher-dsl" % "0.4.5"
 ```
 #### Gradle
 ```gradle
-implementation group: 'me.manishkatoch', name: 'scala-cypher-dsl', version: '0.4.4'
+implementation group: 'me.manishkatoch', name: 'scala-cypher-dsl', version: '0.4.5'
 ```
 
 ## Usage
@@ -117,7 +117,7 @@ for detailed DSL usage and more examples, see [Wiki](https://github.com/manishkk
 
 ## DSL Specifications
 
-as of v0.4.4
+as of v0.4.5
 
 | Cypher Clauses | DSL Support |
 |----------------|-------------|
