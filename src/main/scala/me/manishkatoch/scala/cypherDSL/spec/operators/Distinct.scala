@@ -5,7 +5,7 @@ import me.manishkatoch.scala.cypherDSL.spec.entities.{AliasedProduct, Node, Rela
 import me.manishkatoch.scala.cypherDSL.spec.utils.ElementPropertyExtractingAndAliasing
 import me.manishkatoch.scala.cypherDSL.spec.Utils._
 
-private[spec] case class Distinct(elements: Product*) extends Operator with ElementPropertyExtractingAndAliasing {
+case class Distinct(elements: Product*) extends Operator with ElementPropertyExtractingAndAliasing {
 
   private val errorMessage = "DISTINCT operator requires element to be in Context"
 
@@ -34,8 +34,4 @@ private[spec] case class Distinct(elements: Product*) extends Operator with Elem
 
     DSLResult(if (ids.nonEmpty) s"DISTINCT $ids" else "")
   }
-}
-
-object Distinct {
-  //def apply(elements: (Any, String)*): Distinct = new Distinct(AliasedProduct.makeAliasedProduct(elements.toList): _*)
 }
