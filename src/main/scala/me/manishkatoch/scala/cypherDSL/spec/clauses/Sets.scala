@@ -26,7 +26,7 @@ private[spec] class SetSpec(private val either: Either[ProductSet, EntitySet]) {
         val (element, entitySet) = productSet
         val result               = resultFromEntitySet(entitySet, context)
         val id                   = context.get(element).get
-        result.copy(query = s"$id = {${result.query}}")
+        result.copy(query = s"$id = {${result.query.replace(s"$id.","")}}")
       },
       entitySet => resultFromEntitySet(entitySet, context)
     )

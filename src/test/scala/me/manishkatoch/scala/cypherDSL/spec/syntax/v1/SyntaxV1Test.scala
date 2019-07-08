@@ -147,7 +147,7 @@ class SyntaxV1Test extends WordSpec with Matchers {
     cypher.MATCH(anyPerson).toQuery(context)
     "provide query for an instance with setters" in {
       cypher.SET(person, List(person('name) -> "tom")).toQuery(context) shouldBe DSLResult(
-        "SET a0 = {a0.name = {a0_name}}",
+        "SET a0 = {name = {a0_name}}",
         Map("a0_name" -> "tom"))
     }
     "provide query for an instance with no setters" in {
