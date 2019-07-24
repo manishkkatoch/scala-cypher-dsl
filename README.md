@@ -72,11 +72,11 @@ val johnDoeQuery = cypher.MATCH(johnDoe('name))
     .toQuery()
 
 johnDoeQuery.query
-//res0: String = MATCH (a0:Person {id: {a0_id},name: {a0_name},age: {a0_age}})
+//res0: String = MATCH (a0:Person {name: {a0_name}})
 //              RETURN a0
 
 johnDoeQuery.queryMap
-//res1: scala.collection.immutable.Map[String,Any] = Map(a0_id -> AX31SD, a0_name -> John Doe, a0_age -> 50))
+//res1: scala.collection.immutable.Map[String,Any] = Map(a0_name -> John Doe))
 ```
 > Note: if the property doesn't exist, compilation will fail.
 
