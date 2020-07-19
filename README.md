@@ -134,7 +134,7 @@ as of v0.4.5
 | CREATE | :white_check_mark: |
 | DELETE | :white_check_mark: |
 | SET | :white_check_mark: |
-| REMOVE | :x: |
+| REMOVE | :white_check_mark: |
 | FOREACH | :x: |
 | MERGE | :white_check_mark: |
 | CALL […​YIELD]| :x: |

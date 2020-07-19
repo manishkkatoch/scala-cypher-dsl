@@ -4,15 +4,13 @@ plugins {
     id 'scala'
     id 'idea'
     id "com.github.maiflai.scalatest" version "0.19"
-    id "org.scoverage" version "2.5.0"
+    id "com.adtran.scala-multiversion-plugin" version "1.0.35"
 }
 
 group 'me.manishkatoch'
-
 sourceCompatibility = 1.8
 
 ext {
-    scalaVersion = '2.11.9'
     mavenUrl = project.properties.getOrDefault('maven2_url', System.getenv("MVN_URL"))
     snapshot_url = project.properties.getOrDefault('snapshot_url', System.getenv("MVN_SNAPSHOT_URL"))
     mavenRepositoryUsername = project.properties.getOrDefault('mavenRepositoryUsername', System.getenv("MVN_USERNAME"))
@@ -29,17 +27,12 @@ repositories {
 def isRunningOnTravis = System.getenv("CI") == "true"
 
 dependencies {
-    implementation group: 'org.scala-lang', name: 'scala-library', version: scalaVersion
-    implementation group: 'org.scala-lang', name: 'scala-compiler', version: scalaVersion
-    implementation group: 'org.scala-lang', name: 'scala-reflect', version: scalaVersion
-    implementation group: 'com.chuusai', name: 'shapeless_2.11', version: '2.3.0'
-    scoverage group: 'org.scoverage', name: 'scalac-scoverage-plugin_2.11', version: '1.3.1'
-    scoverage group: 'org.scoverage', name: 'scalac-scoverage-runtime_2.11', version: '1.3.1'
-    testImplementation group: 'org.scalatest', name: 'scalatest_2.11', version: '3.0.1'
+    implementation group: 'org.scala-lang', name: 'scala-library', version: '%scala-version%'
+    implementation group: 'org.scala-lang', name: 'scala-compiler', version: '%scala-version%'
+    implementation group: 'org.scala-lang', name: 'scala-reflect', version: '%scala-version%'
+    implementation group: 'com.chuusai', name: 'shapeless_%%', version: '2.3.3'
+    testImplementation group: 'org.scalatest', name: 'scalatest_%%', version: '3.0.1'
     testRuntime 'org.pegdown:pegdown:1.4.2'
-}
-scoverage {
-    excludedPackages = ["me.manishkatoch.scala.cypherDSL.spec.implicits"]
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
